@@ -30,7 +30,7 @@ function drawPolygon(points){
   return polygon;
 }
 
-function enablePolygonSelect() {
+function enablePolygonSelect(afterSelect) {
   var overLays = {};
 
   var listeners = {};
@@ -58,6 +58,8 @@ function enablePolygonSelect() {
         }
 
         overLays["polygon"] = drawPolygon(points);
+
+        afterSelect && afterSelect();
 
         overLays["polygonMarkers"] = [];
       });
