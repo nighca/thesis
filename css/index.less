@@ -1,0 +1,106 @@
+@import "define.less";
+@import "font-awesome.less";
+
+//------------------------------------------------------------------------
+
+body{
+	font-family: "Microsoft Yahei", Arial;
+}
+
+.title_block{
+	position: absolute;
+	z-index: 110;
+	.title_box{
+		position: relative;
+
+		.arrow_box;
+
+		left: -50%;
+		min-height: 2em;
+		line-height: 2em;
+		padding: 0 1em;
+
+		background-color: @widget_bg_color;
+		color: @widget_ft_color;
+		text-align: center;
+		font-size: 12px;
+
+		.transparent(0.9);
+		.shadow(1px,1px,4px);
+
+		&:after{
+			border-bottom-color: @widget_bg_color;
+			border-width: 5px;
+			right: 50%;
+			margin-right: -5px;
+		}
+	}
+}
+
+div#timemap {
+	padding: 1em;
+}
+
+div#timelinecontainer{
+	width: 100%;
+	height: 200px;
+
+	position: relative;
+}
+
+div#timeline{
+	width: 100%;
+	height: 100%;
+	height: 200px;
+	font-size: 12px;
+	background: #CCCCCC;
+}
+
+div#mapcontainer {
+	width: 100%;
+	height: 400px;
+
+	position: relative;
+}
+
+div#map {
+	width: 100%;
+	height: 100%;
+	background: #EEEEEE;
+}
+
+.ops{
+	position: absolute;
+	top: 4px;
+	z-index: 100;
+
+	font-size: 14px;
+
+	background-color: @widget_bg_color;
+	color: @widget_ft_color;
+	.shadow(1px,1px,4px);
+
+	list-style: none;
+
+	&.timeline-ops{
+		left: 4px;
+	}
+
+	&.map-ops{
+		left: 90px;
+	}
+
+	.op{
+		.inline_block;
+		padding: 6px 6px;
+		cursor: pointer;
+
+		&.disabled{
+			color: #c2c2c2;
+		}
+
+		&:active{
+			background-color: #f0f0f0;
+		}
+	}
+}
