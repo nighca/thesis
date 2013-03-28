@@ -47,6 +47,7 @@ function drawPolyline(map, points){
 }
 
 function enablePointSelect(map, afterSelect) {
+  console.log("Point select");//--------------------
   var overLays = {
     "point" : null
   };
@@ -60,6 +61,8 @@ function enablePointSelect(map, afterSelect) {
 
     var marker = placeMarker(map, event.latLng, pointMarkerIcon);
     overLays["point"] = marker;
+
+    afterSelect && afterSelect();
   });
 
   
@@ -69,7 +72,8 @@ function enablePointSelect(map, afterSelect) {
     },
     getListeners: function(){
       return listeners;
-    }
+    },
+    type: 1
   };
 }
 
@@ -86,6 +90,7 @@ function disablePointSelect(e){
 }
 
 function enableLineSelect(map, afterSelect) {
+  console.log("Line select");//--------------------
   var overLays = {
     "polylineMarkers" : [],
     "polyline" : null
@@ -113,11 +118,12 @@ function enableLineSelect(map, afterSelect) {
     },
     getListeners: function(){
       return listeners;
-    }
+    },
+    type: 2
   };
 }
 
-function disablePolylineSelect(e){
+function disableLineSelect(e){
   var listeners = e.getListeners();
   for(var i in listeners){
     google.maps.event.removeListener(listeners[i]);
@@ -135,6 +141,7 @@ function disablePolylineSelect(e){
 }
 
 function enableBorderSelect(map, afterSelect) {
+  console.log("Border select");//--------------------
   var overLays = {
     "polygonMarkers" : [],
     "polygon" : null
@@ -177,7 +184,8 @@ function enableBorderSelect(map, afterSelect) {
     },
     getListeners: function(){
       return listeners;
-    }
+    },
+    type: 3
   };
 }
 
@@ -198,9 +206,8 @@ function disableBorderSelect(e){
   return null;
 }
 
-
-
 function enablePolygonSelect(map, afterSelect) {
+  console.log("Polygon select");//--------------------
   var overLays = {
     "polygonMarkers" : [],
     "polygon" : null
@@ -243,7 +250,8 @@ function enablePolygonSelect(map, afterSelect) {
     },
     getListeners: function(){
       return listeners;
-    }
+    },
+    type: 4
   };
 }
 

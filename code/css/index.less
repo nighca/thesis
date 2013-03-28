@@ -7,9 +7,18 @@
 	padding: 0;
 }
 
+html{
+	height: 100%;
+}
+
 body{
-	font-family: "Microsoft Yahei", Arial;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	font-family: Arial, "Microsoft Yahei";
 	font-size: 14px;
+	background-color: #fff;
 }
 
 input[type="text"], input[type="password"], select{
@@ -57,32 +66,71 @@ input[type="text"], input[type="password"], select{
 }
 
 .timemap-container{
-	padding: 10px;
+	width: 100%;
+	height: 100%;
+	//overflow-y: scroll;
 
 	.timeline-container, .map-container{
 		position: relative;
 	}
 
 	.timeline-container{
-		height: 200px;
-		margin-bottom: 10px;
+		height: 30%;
+		//height: 200px;
 
 		.timeline{
 			width: 100%;
 			height: 100%;
-			height: 200px;
+			//height: 200px;
 			font-size: 12px;
 			background: #CCCCCC;
 		}
 	}
 
 	.map-container{
-		height: 400px;
+		height: 70%;
+		//height: 40px;
 
 		.map{
 			width: 100%;
 			height: 100%;
 			background: #EEEEEE;
+		}
+	}
+}
+
+.side-container{
+	width: 20%;
+	position: absolute;
+	right: 0;
+	top: 0;
+
+	.objs{
+		padding: 10px;
+		.obj{
+			color: #666;
+
+			.head{
+				padding: 10px;
+
+				font-size: 16px;
+				.shadow(0px,0px,2px);
+			}
+			.body{
+				padding: 10px;
+
+				.infos{
+					.info{
+						padding: 8px 0;
+						border-bottom: 1px dashed #999;
+
+						&:last-child{
+							border-bottom: none;
+						}
+					}
+				}
+			}
+			
 		}
 	}
 }
@@ -100,6 +148,7 @@ input[type="text"], input[type="password"], select{
 	position: absolute;
 	top: 4px;
 	z-index: 100;
+	overflow: hidden;
 
 	font-size: 14px;
 
@@ -119,21 +168,25 @@ input[type="text"], input[type="password"], select{
 
 	.op{
 		.inline_block;
+		float: left;
 		padding: @padding;
 		cursor: pointer;
-
-		&.disabled, &:disabled{
-			color: #c2c2c2;
-		}
 
 		&:active{
 			background-color: #f0f0f0;
 		}
+
+		&.disabled, &:disabled{
+			color: #c2c2c2;
+			background: none;
+		}
 	}
 
 	.vals-in{
-		.inline_block;
+		float: left;
+		display: none;
 		.val-in{
+			float: left;
 			height: @outSize;
 		}
 	}

@@ -33,3 +33,49 @@ TimeSpaceObj.prototype.load = function(name) {
 	this.init(JSON.parse(localStorage[name]));
 	return true;
 };
+
+var parseOverLay = function(type, overLays){
+	switch(type){
+        case 0:
+            return null;
+            break;
+        case 1:
+        	var tp = overLays.point.position;
+            return {
+            	point: new Point(tp.jb, tp.kb)
+            };
+            break;
+        case 2:
+        	var tps = overLays.polyline.getPath().b;
+        	var points = [];
+        	for(var i=0,l=tps.length;i<l;i++){
+        		points.push(new Point(tps[i].jb, tps[i].kb));
+        	}
+            return {
+            	points: points
+            };
+            break;
+        case 3:
+            var tps = overLays.polygon.getPath().b;
+        	var points = [];
+        	for(var i=0,l=tps.length;i<l;i++){
+        		points.push(new Point(tps[i].jb, tps[i].kb));
+        	}
+            return {
+            	points: points
+            };
+            break;
+        case 4:
+            var tps = overLays.polygon.getPath().b;
+        	var points = [];
+        	for(var i=0,l=tps.length;i<l;i++){
+        		points.push(new Point(tps[i].jb, tps[i].kb));
+        	}
+            return {
+            	points: points
+            };
+            break;
+        default:
+            return false;
+    }
+};

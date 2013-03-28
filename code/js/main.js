@@ -10,6 +10,70 @@ $(function() {
 
     //show title
     var recorder = 0;
+
+    var form = $("#vals-in");
+    var nameIn = form.find("[name=name]");
+    var typeIn = form.find("[name=type]");
+
+    var createObj = $("#create-obj");
+    var mapSelect = $("#map-select");
+    var selectOk = $("#map-select-ok");
+
+    var disableSelect = function(e){
+        var funcs = [null, disablePointSelect, disableLineSelect, disableBorderSelect, disablePolygonSelect];
+
+        try{
+            var func = funcs[e.type];
+            e = func(e);
+        }catch(err){
+            console.log(err);
+        }
+
+        return e;
+    };
+
+    var enableSelect = function(type){
+        var e;
+        switch(type){
+            case 0:
+                return null;
+                break;
+            case 1:
+                e = enablePointSelect(map, function(){
+                    selectOk.enable();
+                });
+                break;
+            case 2:
+                e = enableLineSelect(map, function(){
+                    selectOk.enable();
+                });
+                break;
+            case 3:
+                e = enableBorderSelect(map, function(){
+                    selectOk.enable();
+                });
+                break;
+            case 4:
+                e = enablePolygonSelect(map, function(){
+                    selectOk.enable();
+                });
+                break;
+            default:
+                return null;
+        }
+        mapSelect.find("i").removeClass("icon-edit").addClass("icon-trash");
+        return e;
+    }
+
+    var init = function(){
+        selectOk.disable();
+        mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
+        typeIn.disable().val(0);
+        nameIn.val("");
+
+        e = disableSelect(e);
+    };
+
     $("[ntitle]").hover(function(){
         var title = $(this).attr("ntitle");
         if(title){
@@ -40,45 +104,57 @@ $(function() {
         clearTimeout(recorder);
     });
 
+    createObj.click(function(){
+        var i = $(this).find("i");
+        form.toggle();
+        if(i.hasClass("icon-pencil")){
+            i.removeClass("icon-pencil").addClass("icon-remove");
+        }else{
+            i.removeClass("icon-remove").addClass("icon-pencil");
+        }
+    });
 
-    $("#map-select").click(function() {
+    nameIn.keyup(function(){
+        typeIn.setable($(this).val());
+    });
+
+    typeIn.change(function(){
+        var type = parseInt($(this).val());
+
+        e = disableSelect(e);
+        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit");
+    });
+
+
+    mapSelect.click(function() {
         if($(this).hasClass("disabled")) return false;
 
         if(e){
-            e = disablePolygonSelect(e);
+            e = disableSelect(e);
         }
-        e = enablePolygonSelect(map, function(){
-            $("#map-select-ok").removeClass("disabled");
-        });
+
+        var type = parseInt(typeIn.val());
+        e = enableSelect(type);
     });
-    $("#map-select-ok").click(function() {
+
+    selectOk.click(function() {
         if($(this).hasClass("disabled")) return false;
 
         var obj = new TimeSpaceObj();
-        var form = $("#new-obj");
-        var name = form.find("[name=name]").val();
-        var type = form.find("[name=type]").val();
-
-        var ps = e.getOverLays().polygon.getPath().b;
-        var points = [];
-
-        for(var i=0,l=ps.length;i<l;i++){
-            points.push(new Point(ps[i].kb, ps[i].lb));
-        }
+        
+        var name = nameIn.val();
+        var type = parseInt(typeIn.val());
+        var spaceZone = parseOverLay(type, e.getOverLays());
 
         obj.init({
             name: name,
             type: type,
-            spaceZone: {
-                points: points
-            }
+            spaceZone: spaceZone
         });
         console.log(obj);
+        obj.save();
 
-        if (e) {
-            e = disablePolygonSelect(e);
-            $(this).addClass("disabled");
-        }
+        init();
     });
 
     $("#timeline-in").click(function(){
