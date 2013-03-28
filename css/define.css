@@ -1,9 +1,0 @@
-@font-face{font-family:'TeXGyre';src:url('../font/texgyreadventor-regular-webfont.woff') format('woff');font-weight:normal;font-style:normal;}*{margin:0;}
-ul{list-style:none;padding:0;margin:0;}
-.inline_block{display:inline-block;_zoom:1;*zoom:1;_display:inline;*display:inline;}
-.arrow_box:after{bottom:100%;border:solid transparent;content:" ";height:0;width:0;position:absolute;pointer-events:none;border-bottom-color:transparent;border-width:5px;right:10px;}
-.left{float:left;}
-.right{float:right;}
-.align_lef{text-align:left;}
-.align_right{text-align:right;}
-.align_center{text-align:center;}
