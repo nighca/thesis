@@ -6,6 +6,7 @@
     <title>N</title>
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAi8v6Ahh_ZWnUE517FJYL4bojwnAcl0IA&sensor=false"></script>
     <script type="text/javascript" src="add-on/timemap.2.0.1/lib/jquery-1.6.2.min.js"></script>
+    <script src="js/jq-extend.js" type="text/javascript"></script>
     <script type="text/javascript" src="add-on/timemap.2.0.1/lib/mxn/mxn.js?(googlev3)"></script>
 
     <script type="text/javascript" src="add-on/timemap.2.0.1/lib/timeline-2.3.0-debug.js"></script>
@@ -14,37 +15,72 @@
   -->
     <script src="add-on/timemap.2.0.1/src/timemap.js" type="text/javascript"></script>
     <script src="add-on/timemap.2.0.1/src/manipulation.js" type="text/javascript"></script>
+    <script src="js/TimeSpaceObj.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="css/index.css">
 	</head>
 	<body>
     <div id="title_block" class="title_block" style="display:none;">
       <div id="title_box" class="title_box">I'm the title box.</div>
     </div>
-    
 
-		<div id="timemap">
-        <div id="timelinecontainer">
-          <ul class="ops timeline-ops">
-            <li id="timeline-in" class="op" ntitle="zoom in">
-              <i class="icon-zoom-in"></i>
-            </li>
-            <li id="timeline-out" class="op" ntitle="zoom out">
-              <i class="icon-zoom-out"></i>
-            </li>
-          </ul>
-          <div id="timeline"></div>
-        </div>
-        <div id="mapcontainer">
-          <ul class="ops map-ops">
-            <li id="map-select" class="op" ntitle="select a zone on map">
+		<div id="timemap" class="timemap-container">
+
+      <div id="timelinecontainer" class="timeline-container">
+
+        <ul class="ops timeline-ops">
+          <li id="timeline-in" class="op" ntitle="zoom in">
+            <i class="icon-zoom-in"></i>
+          </li>
+          <li id="timeline-out" class="op" ntitle="zoom out">
+            <i class="icon-zoom-out"></i>
+          </li>
+        </ul>
+
+        <div id="timeline" class="timeline"></div>
+      </div>
+
+      <div id="mapcontainer" class="map-container">
+
+        <ul class="ops map-ops">
+          <li id="create-obj" class="op" ntitle="create a TimeSpace Object">
+            <i class="icon-pencil"></i>
+          </li>
+          <form id="vals-in" class="vals-in">
+            <input name="name" type="text" class="val-in" placeholder="Name" />
+            <select name="type" id="" class="val-in" disabled="disabled">
+              <option value="0">Type</option>
+              <option value="1">Point</option>
+              <option value="2">Line</option>
+              <option value="3">Border</option>
+              <option value="4">Polygon</option>
+            </select>
+            <li id="map-select" class="op disabled" ntitle="select a zone on map">
               <i class="icon-edit"></i>
             </li>
             <li id="map-select-ok" class="op disabled" ntitle="use the selected zone">
               <i class="icon-ok"></i>
             </li>
-          </ul>
-          <div id="map"></div>
-        </div>
+          </form>
+        </ul>
+
+        <div id="map" class="map"></div>
+      </div>
+    
+    </div>
+
+    <div class="side-container">
+      <ul class="objs">
+        <li class="obj">
+          <div class="head">Test</div>
+          <div class="body">
+            <ul class="infos">
+              <li class="info">name: test</li>
+              <li class="info">type: Point</li>
+              <li class="info">...</li>
+            </ul>
+          </div>
+        </li>
+      </ul>
     </div>
     
 	</body>
