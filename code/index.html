@@ -14,6 +14,7 @@
   -->
     <script src="add-on/timemap.2.0.1/src/timemap.js" type="text/javascript"></script>
     <script src="add-on/timemap.2.0.1/src/manipulation.js" type="text/javascript"></script>
+    <script src="js/TimeSpaceObj.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="css/index.css">
 	</head>
 	<body>
@@ -22,8 +23,8 @@
     </div>
     
 
-		<div id="timemap">
-        <div id="timelinecontainer">
+		<div id="timemap" class="timemap-container">
+        <div id="timelinecontainer" class="timeline-container">
           <ul class="ops timeline-ops">
             <li id="timeline-in" class="op" ntitle="zoom in">
               <i class="icon-zoom-in"></i>
@@ -32,18 +33,31 @@
               <i class="icon-zoom-out"></i>
             </li>
           </ul>
-          <div id="timeline"></div>
+          <div id="timeline" class="timeline"></div>
         </div>
-        <div id="mapcontainer">
+        <div id="mapcontainer" class="map-container">
           <ul class="ops map-ops">
-            <li id="map-select" class="op" ntitle="select a zone on map">
-              <i class="icon-edit"></i>
+            <li id="obj-create" class="op" ntitle="create a TimeSpace Object">
+              <i class="icon-pencil"></i>
             </li>
+            <form id="new-obj" class="vals-in">
+              <input name="name" type="text" class="val-in" placeholder="Name" />
+              <select name="type" id="" class="val-in">
+                <option value="0">Type</option>
+                <option value="1">Point</option>
+                <option value="2">Line</option>
+                <option value="3">Border</option>
+                <option value="4">Polygon</option>
+              </select>
+              <li id="map-select" class="op" ntitle="select a zone on map">
+                <i class="icon-edit"></i>
+              </li>
+            </form>
             <li id="map-select-ok" class="op disabled" ntitle="use the selected zone">
               <i class="icon-ok"></i>
             </li>
           </ul>
-          <div id="map"></div>
+          <div id="map" class="map"></div>
         </div>
     </div>
     

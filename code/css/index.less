@@ -2,9 +2,28 @@
 @import "font-awesome.less";
 
 //------------------------------------------------------------------------
+*{
+	margin: 0;
+	padding: 0;
+}
 
 body{
 	font-family: "Microsoft Yahei", Arial;
+	font-size: 14px;
+}
+
+input[type="text"], input[type="password"], select{
+	border-style: none;
+	background-color: transparent;
+	background: none;
+
+	&:focus{
+		outline: none;
+	}
+
+	&:disabled{
+		color: #c2c2c2;
+	}
 }
 
 .title_block{
@@ -37,39 +56,47 @@ body{
 	}
 }
 
-div#timemap {
-	padding: 1em;
-}
+.timemap-container{
+	padding: 10px;
 
-div#timelinecontainer{
-	width: 100%;
-	height: 200px;
+	.timeline-container, .map-container{
+		position: relative;
+	}
 
-	position: relative;
-}
+	.timeline-container{
+		height: 200px;
+		margin-bottom: 10px;
 
-div#timeline{
-	width: 100%;
-	height: 100%;
-	height: 200px;
-	font-size: 12px;
-	background: #CCCCCC;
-}
+		.timeline{
+			width: 100%;
+			height: 100%;
+			height: 200px;
+			font-size: 12px;
+			background: #CCCCCC;
+		}
+	}
 
-div#mapcontainer {
-	width: 100%;
-	height: 400px;
+	.map-container{
+		height: 400px;
 
-	position: relative;
-}
-
-div#map {
-	width: 100%;
-	height: 100%;
-	background: #EEEEEE;
+		.map{
+			width: 100%;
+			height: 100%;
+			background: #EEEEEE;
+		}
+	}
 }
 
 .ops{
+	@size: 16px;
+	@padding: 6px;
+	@outSize: @size + @padding*2;
+
+	[class^="icon-"], [class*=" icon-"]{
+		width: @size;
+		height: @size;
+	}
+
 	position: absolute;
 	top: 4px;
 	z-index: 100;
@@ -92,15 +119,22 @@ div#map {
 
 	.op{
 		.inline_block;
-		padding: 6px 6px;
+		padding: @padding;
 		cursor: pointer;
 
-		&.disabled{
+		&.disabled, &:disabled{
 			color: #c2c2c2;
 		}
 
 		&:active{
 			background-color: #f0f0f0;
+		}
+	}
+
+	.vals-in{
+		.inline_block;
+		.val-in{
+			height: @outSize;
 		}
 	}
 }

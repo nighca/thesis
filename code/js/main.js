@@ -47,12 +47,33 @@ $(function() {
         if(e){
             e = disablePolygonSelect(e);
         }
-        e = enablePolygonSelect(function(){
+        e = enablePolygonSelect(map, function(){
             $("#map-select-ok").removeClass("disabled");
         });
     });
     $("#map-select-ok").click(function() {
         if($(this).hasClass("disabled")) return false;
+
+        var obj = new TimeSpaceObj();
+        var form = $("#new-obj");
+        var name = form.find("[name=name]").val();
+        var type = form.find("[name=type]").val();
+
+        var ps = e.getOverLays().polygon.getPath().b;
+        var points = [];
+
+        for(var i=0,l=ps.length;i<l;i++){
+            points.push(new Point(ps[i].kb, ps[i].lb));
+        }
+
+        obj.init({
+            name: name,
+            type: type,
+            spaceZone: {
+                points: points
+            }
+        });
+        console.log(obj);
 
         if (e) {
             e = disablePolygonSelect(e);
