@@ -12,6 +12,26 @@ function destroyOverLay(obj) {
   if(obj) obj.setMap(null);
 }
 
+function drawCircle(map, center, radius, fill){
+  radius = radius || defaultRadius;
+  fillColor = fill ? "#ff0000" : null;
+  fillOpacity = fill ? 0.35 : null;
+  var circle = new google.maps.Circle({
+    strokeColor: "#FF0000",
+    strokeOpacity: 0.8,
+    strokeWeight: 2,
+    fillColor: fillColor,
+    fillOpacity: fillOpacity,
+
+    map: map,
+    center: center,
+    radius: radius,
+
+    editable: true
+  });
+
+  return circle;
+}
 
 function drawPolygon(map, points, fill){
   fillColor = fill ? "#ff0000" : null;
@@ -49,18 +69,18 @@ function drawPolyline(map, points){
 function enablePointSelect(map, afterSelect) {
   console.log("Point select");//--------------------
   var overLays = {
-    "point" : null
+    "circle" : null
   };
   var listeners = {};
 
   listeners["map"] = google.maps.event.addListener(map, 'click', function(event) {
     if(overLays["point"]){ //to release certain point
-      destroyOverLay(overLays["point"]);
-      overLays["point"] = null;
+      destroyOverLay(overLays["circle"]);
+      overLays["circle"] = null;
     }
 
-    var marker = placeMarker(map, event.latLng, pointMarkerIcon);
-    overLays["point"] = marker;
+    var circle = drawCircle(map, event.latLng, null, true);
+    overLays["circle"] = circle;
 
     afterSelect && afterSelect();
   });
@@ -73,26 +93,23 @@ function enablePointSelect(map, afterSelect) {
     getListeners: function(){
       return listeners;
     },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
+    },
     type: 1
   };
-}
-
-function disablePointSelect(e){
-  var listeners = e.getListeners();
-  for(var i in listeners){
-    google.maps.event.removeListener(listeners[i]);
-  }
-
-  var overLays = e.getOverLays();
-  destroyOverLay(overLays["point"]);
-
-  return null;
 }
 
 function enableLineSelect(map, afterSelect) {
   console.log("Line select");//--------------------
   var overLays = {
-    "polylineMarkers" : [],
+    "circle" : null,
     "polyline" : null
   };
   var listeners = {};
@@ -104,10 +121,11 @@ function enableLineSelect(map, afterSelect) {
       overLays["polyline"] = null;
     }
 
-    var marker = placeMarker(map, event.latLng, polylineMarkerIcon);
-    points.push(marker.position);
+    var pointNum = points.push(event.latLng);
     overLays["polyline"] = drawPolyline(map, points, true);
-    overLays["polylineMarkers"].push(marker);
+    if(pointNum==1){
+      overLays["circle"] = drawCircle(map, event.latLng, null, true);
+    }
 
     afterSelect && afterSelect();
   });
@@ -118,32 +136,24 @@ function enableLineSelect(map, afterSelect) {
     },
     getListeners: function(){
       return listeners;
+    },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
     },
     type: 2
   };
 }
 
-function disableLineSelect(e){
-  var listeners = e.getListeners();
-  for(var i in listeners){
-    google.maps.event.removeListener(listeners[i]);
-  }
-
-  var overLays = e.getOverLays();
-  destroyOverLay(overLays["polyline"]);
-
-  var polylineMarkers = overLays["polylineMarkers"];
-  for (var i = polylineMarkers.length - 1; i >= 0; i--) {
-    destroyOverLay(polylineMarkers[i]);
-  };
-
-  return null;
-}
-
 function enableBorderSelect(map, afterSelect) {
   console.log("Border select");//--------------------
   var overLays = {
-    "polygonMarkers" : [],
+    "circle" : null,
     "polygon" : null
   };
   var listeners = {};
@@ -155,24 +165,11 @@ function enableBorderSelect(map, afterSelect) {
       overLays["polygon"] = null;
     }
 
-    var marker = placeMarker(map, event.latLng, polygonMarkerIcon);
-    points.push(marker.position);
+    var pointNum = points.push(event.latLng);
     overLays["polygon"] = drawPolygon(map, points, false);
 
-    if(overLays["polygonMarkers"].push(marker)==1){
-      marker.setIcon(polygonStartMarkerIcon);
-
-      listeners["marker"] = google.maps.event.addListener(marker, 'click', function(event) {
-        // var points = [];
-        var polygonMarker;
-
-        while(polygonMarker = overLays["polygonMarkers"].pop()){
-          // points.push(polygonMarker.position);
-          destroyOverLay(polygonMarker);
-        }
-        overLays["polygonMarkers"] = [];
-        points = [];
-      });
+    if(pointNum==1){
+      overLays["circle"] = drawCircle(map, event.latLng, null, true);
     }
 
     afterSelect && afterSelect();
@@ -184,32 +181,23 @@ function enableBorderSelect(map, afterSelect) {
     },
     getListeners: function(){
       return listeners;
+    },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
     },
     type: 3
   };
 }
 
-function disableBorderSelect(e){
-  var listeners = e.getListeners();
-  for(var i in listeners){
-    google.maps.event.removeListener(listeners[i]);
-  }
-
-  var overLays = e.getOverLays();
-  destroyOverLay(overLays["polygon"]);
-
-  var polygonMarkers = overLays["polygonMarkers"];
-  for (var i = polygonMarkers.length - 1; i >= 0; i--) {
-    destroyOverLay(polygonMarkers[i]);
-  };
-
-  return null;
-}
-
 function enablePolygonSelect(map, afterSelect) {
   console.log("Polygon select");//--------------------
   var overLays = {
-    "polygonMarkers" : [],
     "polygon" : null
   };
   var listeners = {};
@@ -220,26 +208,8 @@ function enablePolygonSelect(map, afterSelect) {
       destroyOverLay(overLays["polygon"]);
       overLays["polygon"] = null;
     }
-
-    var marker = placeMarker(map, event.latLng, polygonMarkerIcon);
-    points.push(marker.position);
+    points.push(event.latLng);
     overLays["polygon"] = drawPolygon(map, points, true);
-
-    if(overLays["polygonMarkers"].push(marker)==1){
-      marker.setIcon(polygonStartMarkerIcon);
-
-      listeners["marker"] = google.maps.event.addListener(marker, 'click', function(event) {
-        // var points = [];
-        var polygonMarker;
-
-        while(polygonMarker = overLays["polygonMarkers"].pop()){
-          // points.push(polygonMarker.position);
-          destroyOverLay(polygonMarker);
-        }
-        overLays["polygonMarkers"] = [];
-        points = [];
-      });
-    }
 
     afterSelect && afterSelect();
   });
@@ -251,23 +221,20 @@ function enablePolygonSelect(map, afterSelect) {
     getListeners: function(){
       return listeners;
     },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
+    },
     type: 4
   };
 }
 
-function disablePolygonSelect(e){
-  var listeners = e.getListeners();
-  for(var i in listeners){
-    google.maps.event.removeListener(listeners[i]);
-  }
-
-  var overLays = e.getOverLays();
-  destroyOverLay(overLays["polygon"]);
-
-  var polygonMarkers = overLays["polygonMarkers"];
-  for (var i = polygonMarkers.length - 1; i >= 0; i--) {
-    destroyOverLay(polygonMarkers[i]);
-  };
-
+function disableSpaceSelect(e){
+  e && e.clean();
   return null;
 }

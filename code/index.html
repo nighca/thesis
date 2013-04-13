@@ -5,8 +5,11 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <title>N</title>
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAi8v6Ahh_ZWnUE517FJYL4bojwnAcl0IA&sensor=false"></script>
+    <script type="text/javascript" src="add-on/jquery/jquery-1.9.1.min.js"></script>
+    <!--
     <script type="text/javascript" src="add-on/timemap.2.0.1/lib/jquery-1.6.2.min.js"></script>
-    <script src="js/jq-extend.js" type="text/javascript"></script>
+  -->
+    <script type="text/javascript" src="add-on/template/template.js"></script>
     <script type="text/javascript" src="add-on/timemap.2.0.1/lib/mxn/mxn.js?(googlev3)"></script>
 
     <script type="text/javascript" src="add-on/timemap.2.0.1/lib/timeline-2.3.0-debug.js"></script>
@@ -15,6 +18,7 @@
   -->
     <script src="add-on/timemap.2.0.1/src/timemap.js" type="text/javascript"></script>
     <script src="add-on/timemap.2.0.1/src/manipulation.js" type="text/javascript"></script>
+    <script src="js/my-extend.js" type="text/javascript"></script>
     <script src="js/TimeSpaceObj.js" type="text/javascript"></script>
     <link rel="stylesheet" type="text/css" href="css/index.css">
 	</head>
@@ -34,6 +38,14 @@
           <li id="timeline-out" class="op" ntitle="zoom out">
             <i class="icon-zoom-out"></i>
           </li>
+          <form id="time-vals-in" class="vals-in">
+            <li id="timeline-select" class="op disabled" ntitle="select a period on timeline">
+              <i class="icon-edit"></i>
+            </li>
+            <li id="timeline-select-ok" class="op disabled" ntitle="use the selected zone">
+              <i class="icon-ok"></i>
+            </li>
+          </form>
         </ul>
 
         <div id="timeline" class="timeline"></div>
@@ -45,7 +57,7 @@
           <li id="create-obj" class="op" ntitle="create a TimeSpace Object">
             <i class="icon-pencil"></i>
           </li>
-          <form id="vals-in" class="vals-in">
+          <form id="space-vals-in" class="vals-in">
             <input name="name" type="text" class="val-in" placeholder="Name" />
             <select name="type" id="" class="val-in" disabled="disabled">
               <option value="0">Type</option>
@@ -60,6 +72,9 @@
             <li id="map-select-ok" class="op disabled" ntitle="use the selected zone">
               <i class="icon-ok"></i>
             </li>
+            <li id="obj-create-ok" class="op disabled" ntitle="save the obj">
+              <i class="icon-save"></i>
+            </li>
           </form>
         </ul>
 
@@ -69,17 +84,49 @@
     </div>
 
     <div class="side-container">
-      <ul class="objs">
+      <ul id="objs" class="objs">
+        <script id="obj-template" type="text/html">
+
         <li class="obj">
-          <div class="head">Test</div>
+          <div class="head" name="name"><%=name%></div>
           <div class="body">
             <ul class="infos">
-              <li class="info">name: test</li>
-              <li class="info">type: Point</li>
-              <li class="info">...</li>
+              <li class="info">name: <%=name%></li>
+              <li class="info">
+                <h4>space-zones: </h4>
+                <ul class="space-zones">
+                  <% for (var i = 0; i < spaceZone.zones.length; i ++) { %>
+                  <li class="space-zone">
+                    <%= $stringify(spaceZone.zones[i]) %>
+                  </li>
+                  <% } %>
+                </ul>
+              </li>
+              <li class="info">
+                <h4>time-zones: </h4>
+                <ul class="time-zones">
+                  <% for (var i = 0; i < timeZone.zones.length; i ++) { %>
+                  <li class="time-zone">
+                    <%= $stringify(timeZone.zones[i]) %>
+                  </li>
+                  <% } %>
+                </ul>
+              </li>
+              <li class="info">
+                <h4>tags: </h4>
+                <ul class="tags">
+                  <% for (var i = 0; i < tags.length; i ++) { %>
+                  <li class="tag">
+                    <%= tags[i] %>
+                  </li>
+                  <% } %>
+                </ul>
+              </li>
             </ul>
           </div>
         </li>
+
+        </script>
       </ul>
     </div>
     
