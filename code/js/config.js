@@ -1,3 +1,5 @@
+var defaultRadius = 10000;
+
 var pointMarkerIcon = {
   path: google.maps.SymbolPath.CIRCLE,
   fillColor: "blue",

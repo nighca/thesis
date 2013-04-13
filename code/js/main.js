@@ -1,169 +1,9 @@
 var tm;
 var map;
 var e;
+var et;
 
-/**
- * bindings -------------------------------------------------------
- */
-
-$(function() {
-
-    //show title
-    var recorder = 0;
-
-    var form = $("#vals-in");
-    var nameIn = form.find("[name=name]");
-    var typeIn = form.find("[name=type]");
-
-    var createObj = $("#create-obj");
-    var mapSelect = $("#map-select");
-    var selectOk = $("#map-select-ok");
-
-    var disableSelect = function(e){
-        var funcs = [null, disablePointSelect, disableLineSelect, disableBorderSelect, disablePolygonSelect];
-
-        try{
-            var func = funcs[e.type];
-            e = func(e);
-        }catch(err){
-            console.log(err);
-        }
-
-        return e;
-    };
-
-    var enableSelect = function(type){
-        var e;
-        switch(type){
-            case 0:
-                return null;
-                break;
-            case 1:
-                e = enablePointSelect(map, function(){
-                    selectOk.enable();
-                });
-                break;
-            case 2:
-                e = enableLineSelect(map, function(){
-                    selectOk.enable();
-                });
-                break;
-            case 3:
-                e = enableBorderSelect(map, function(){
-                    selectOk.enable();
-                });
-                break;
-            case 4:
-                e = enablePolygonSelect(map, function(){
-                    selectOk.enable();
-                });
-                break;
-            default:
-                return null;
-        }
-        mapSelect.find("i").removeClass("icon-edit").addClass("icon-trash");
-        return e;
-    }
-
-    var init = function(){
-        selectOk.disable();
-        mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
-        typeIn.disable().val(0);
-        nameIn.val("");
-
-        e = disableSelect(e);
-    };
-
-    $("[ntitle]").hover(function(){
-        var title = $(this).attr("ntitle");
-        if(title){
-            var offset = $(this).offset();
-
-            var width = $(this).width();
-            var height = $(this).height();
-
-            var paddingLeft = parseInt($(this).css("padding-left"));
-            var paddingBottom = parseInt($(this).css("padding-bottom"));
-
-            recorder = setTimeout(function(){
-                $("#title_box").text(title);
-                $("#title_block").css({
-                    left: offset.left,
-                    top: offset.top + height + 5 + 3,
-                    marginLeft: width/2 + paddingLeft,
-                    marginTop: paddingBottom
-                }).fadeIn(200);
-
-                recorder = setTimeout(function(){
-                    $("#title_block").fadeOut(200);
-                },1000);
-            },500);
-        }
-    }, function(){
-        $("#title_block").fadeOut(200);
-        clearTimeout(recorder);
-    });
-
-    createObj.click(function(){
-        var i = $(this).find("i");
-        form.toggle();
-        if(i.hasClass("icon-pencil")){
-            i.removeClass("icon-pencil").addClass("icon-remove");
-        }else{
-            i.removeClass("icon-remove").addClass("icon-pencil");
-        }
-    });
-
-    nameIn.keyup(function(){
-        typeIn.setable($(this).val());
-    });
-
-    typeIn.change(function(){
-        var type = parseInt($(this).val());
-
-        e = disableSelect(e);
-        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit");
-    });
-
-
-    mapSelect.click(function() {
-        if($(this).hasClass("disabled")) return false;
-
-        if(e){
-            e = disableSelect(e);
-        }
-
-        var type = parseInt(typeIn.val());
-        e = enableSelect(type);
-    });
-
-    selectOk.click(function() {
-        if($(this).hasClass("disabled")) return false;
-
-        var obj = new TimeSpaceObj();
-        
-        var name = nameIn.val();
-        var type = parseInt(typeIn.val());
-        var spaceZone = parseOverLay(type, e.getOverLays());
-
-        obj.init({
-            name: name,
-            type: type,
-            spaceZone: spaceZone
-        });
-        console.log(obj);
-        obj.save();
-
-        init();
-    });
-
-    $("#timeline-in").click(function(){
-        zoomIn(tm, 0);
-    });
-    $("#timeline-out").click(function(){
-        zoomOut(tm, 0);
-    });
-});
+var rightList;
 
 /**
  * main -------------------------------------------------------
@@ -275,4 +115,196 @@ $(function() {
     map = tm.getNativeMap();
     map.mapTypes.set("simple", simpleMapType);
     map.setMapTypeId("simple");
+});
+
+/**
+ * bindings -------------------------------------------------------
+ */
+
+ $(function(){
+    rightList = $("#objs").checkList(".head", ".body");
+
+    //show title
+    var recorder = 0;
+
+    var spaceForm = $("#space-vals-in");
+    var timeForm = $("#time-vals-in");
+    var nameIn = spaceForm.find("[name=name]");
+    var typeIn = spaceForm.find("[name=type]");
+
+    var createObj = $("#create-obj");
+    var mapSelect = $("#map-select");
+    var timelineSelect = $("#timeline-select");
+    var mapSelectOk = $("#map-select-ok");
+    var timelineSelectOk = $("#timeline-select-ok");
+    var createOk = $("#obj-create-ok");
+
+    var currentObj = new TimeSpaceObj();
+
+    var enableSpaceSelect = function(type){
+        var e;
+        switch(type){
+            case 0:
+                return null;
+                break;
+            case 1:
+                e = enablePointSelect(map, function(){
+                    mapSelectOk.enable();
+                });
+                break;
+            case 2:
+                e = enableLineSelect(map, function(){
+                    mapSelectOk.enable();
+                });
+                break;
+            case 3:
+                e = enableBorderSelect(map, function(){
+                    mapSelectOk.enable();
+                });
+                break;
+            case 4:
+                e = enablePolygonSelect(map, function(){
+                    mapSelectOk.enable();
+                });
+                break;
+            default:
+                return null;
+        }
+        mapSelect.find("i").removeClass("icon-edit").addClass("icon-trash");
+        return e;
+    };
+
+    var init = function(){
+        createOk.disable();
+        timelineSelectOk.disable();
+        mapSelectOk.disable();
+        timelineSelect.disable();
+        mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
+        typeIn.disable().val(0);
+        nameIn.val("");
+
+        e = disableSpaceSelect(e);
+        et = disablePeriodSelect(et);
+    };
+
+    $("[ntitle]").hover(function(){
+        var title = $(this).attr("ntitle");
+        if(title){
+            var offset = $(this).offset();
+
+            var width = $(this).width();
+            var height = $(this).height();
+
+            var paddingLeft = parseInt($(this).css("padding-left"));
+            var paddingBottom = parseInt($(this).css("padding-bottom"));
+
+            recorder = setTimeout(function(){
+                $("#title_box").text(title);
+                $("#title_block").css({
+                    left: offset.left,
+                    top: offset.top + height + 5 + 3,
+                    marginLeft: width/2 + paddingLeft,
+                    marginTop: paddingBottom
+                }).fadeIn(200);
+
+                recorder = setTimeout(function(){
+                    $("#title_block").fadeOut(200);
+                },1000);
+            },500);
+        }
+    }, function(){
+        $("#title_block").fadeOut(200);
+        clearTimeout(recorder);
+    });
+
+    createObj.click(function(){
+        var i = $(this).find("i");
+        spaceForm.toggle();
+        timeForm.toggle();
+        init();
+        if(i.hasClass("icon-pencil")){
+            i.removeClass("icon-pencil").addClass("icon-remove");
+        }else{
+            i.removeClass("icon-remove").addClass("icon-pencil");
+        }
+    });
+
+    nameIn.keyup(function(){
+        var hasName = $(this).val();
+        typeIn.setable(hasName);
+        timelineSelect.setable(hasName);
+    });
+
+    typeIn.change(function(){
+        var type = parseInt($(this).val());
+
+        e = disableSpaceSelect(e);
+        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit").trigger("click");
+    });
+
+    timelineSelect.click(function(){
+        if(et){
+            et = disablePeriodSelect(et);
+        }
+        et = enablePeriodSelect(tm.timeline, function(){
+            //log(et.getPeriod());
+            timelineSelectOk.enable();
+        });
+    });
+
+    mapSelect.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        if(e){
+            e = disableSpaceSelect(e);
+        }
+
+        var type = parseInt(typeIn.val());
+        e = enableSpaceSelect(type);
+    });
+
+    mapSelectOk.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit");
+
+        var type = parseInt(typeIn.val());
+        var spaceZone = parseOverLay(type, e.getOverLays());
+
+        currentObj.addSpaceZone(spaceZone);
+        createOk.enable();
+        console.log(spaceZone);//----------------------------
+    });
+
+    timelineSelectOk.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        var timeZone = parsePeriod(et.getPeriod());
+
+        currentObj.addTimeZone(timeZone);
+        createOk.enable();
+        console.log(timeZone);//----------------------------
+    });
+
+    createOk.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        var name = nameIn.val();
+
+        currentObj.name = name;
+        console.log(currentObj);
+        currentObj.save();
+
+        rightList.addNode(template.render('obj-template', currentObj));
+
+        init();
+    });
+
+    $("#timeline-in").click(function(){
+        zoomIn(tm, 0);
+    });
+    $("#timeline-out").click(function(){
+        zoomOut(tm, 0);
+    });
+    
 });
