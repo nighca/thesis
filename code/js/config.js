@@ -1,3 +1,5 @@
+var spaceZoneTypes = ["Null", "Point", "Line", "Border", "Polygon"];
+
 var defaultRadius = 10000;
 
 var pointMarkerIcon = {

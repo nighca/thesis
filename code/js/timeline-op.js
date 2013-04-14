@@ -85,8 +85,8 @@ function enablePeriodSelect(timeline, afterSelect){
 
     var getDate = function(event) {
         var A = SimileAjax.DOM.getEventRelativeCoordinates(event, this);
-        var date = band._ether.pixelOffsetToDate(A.x + band._viewOffset);
-        //console.log(date);
+        var date = band._ether.pixelOffsetToDate(A.x + band._viewOffset).valueOf();
+        qqq = date;//-------------------------------
 
         dates.add(date, A);
     };

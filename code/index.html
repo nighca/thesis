@@ -85,46 +85,72 @@
 
     <div class="side-container">
       <ul id="objs" class="objs">
+
+        <script id="info-template" type="text/html">
+          <% if (typeof info === "string" || typeof info === "number") { %>
+          <p class="cnt val"><%=info%></p>
+          <% } else if (isArray(info)) {%>
+            <% if (info.length > 0) { %>
+              <ul class="cnt">
+              <% for (var i=0;i<info.length;i++) { %>
+                <li class="array-list-<%=i+1%>">
+                <h4 class="ttl">
+                  <%=i+1%>
+                  <% if (isArray(info[i])) { %>
+                    (<%=info[i].length%>)
+                  <% } %>
+                  <span class="more-mark">+</span><span class="no-more-mark">-</span>
+                </h4>
+                <% include("info-template", {info: info[i]}) %>
+                </li>
+              <% } %>
+              </ul>
+            <% } else { %>
+              <p class="cnt val">None</p>
+            <% } %>
+          <% } else if (typeof info === "object") {%>
+            <ul class="cnt">
+            <% for (var key in info) { %>
+              <li>
+              <h4 class="ttl">
+                <%=key%>
+                <% if (isArray(info[key])) { %>
+                  (<%=info[key].length%>)
+                <% } %>
+                <span class="more-mark">+</span><span class="no-more-mark">-</span>
+              </h4>
+              <% if (key == "type") { %>
+                <% include("info-template", {info: getSpaceType(info[key])}) %>
+                <% }else{ %>
+                <% include("info-template", {info: info[key]}) %>
+                <% } %>
+              <% } %>
+              </li>
+            </ul>
+          <% } %>
+        </script>
         <script id="obj-template" type="text/html">
 
         <li class="obj">
           <div class="head" name="name"><%=name%></div>
           <div class="body">
             <ul class="infos">
-              <li class="info">name: <%=name%></li>
+              <li class="info"><strong>name: </strong><span class="name val"><%=name%></span></li>
               <li class="info">
-                <h4>space-zones: </h4>
-                <ul class="space-zones">
-                  <% for (var i = 0; i < spaceZone.zones.length; i ++) { %>
-                  <li class="space-zone">
-                    <%= $stringify(spaceZone.zones[i]) %>
-                  </li>
-                  <% } %>
-                </ul>
+                <h4 class="ttl">space-zones (<%=spaceZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+                <% include("info-template", {info: spaceZone.zones}) %>
               </li>
               <li class="info">
-                <h4>time-zones: </h4>
-                <ul class="time-zones">
-                  <% for (var i = 0; i < timeZone.zones.length; i ++) { %>
-                  <li class="time-zone">
-                    <%= $stringify(timeZone.zones[i]) %>
-                  </li>
-                  <% } %>
-                </ul>
+                <h4 class="ttl">time-zones (<%=timeZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+                <% include("info-template", {info: timeZone.zones}) %>
               </li>
               <li class="info">
-                <h4>tags: </h4>
-                <ul class="tags">
-                  <% for (var i = 0; i < tags.length; i ++) { %>
-                  <li class="tag">
-                    <%= tags[i] %>
-                  </li>
-                  <% } %>
-                </ul>
+                <h4 class="ttl">tags (<%=tags.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+                <% include("info-template", {info: tags}) %>
               </li>
             </ul>
           </div>
-        </li>
+        </li>        
 
         </script>
       </ul>
