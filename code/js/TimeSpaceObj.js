@@ -1,5 +1,3 @@
-var spaceZoneTypes = ["Null", "Point", "Line", "Border", "Polygon"];
-
 var Point = function (latitude, longitude) {
 	if(typeof(latitude)!=="number" || typeof(longitude)!=="number") return null;
 	this.lat = latitude;
@@ -67,12 +65,20 @@ TimeSpaceObj.prototype.addSpaceZone = function() {
 
 TimeSpaceObj.prototype.save = function() {
 	localStorage[this.name] = JSON.stringify(this);
-	return true;
+	return this;
 };
 
 TimeSpaceObj.prototype.load = function(name) {
-	this.init(JSON.parse(localStorage[name]));
-	return true;
+    if(localStorage[name]){
+    	this.init(JSON.parse(localStorage[name]));
+    }
+	return this;
+};
+
+TimeSpaceObj.prototype.delete = function() {
+    localStorage.removeItem(this.name);
+    this = null;
+    return this;
 };
 
 var parseOverLay = function(type, overLays){

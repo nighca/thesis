@@ -1,4 +1,4 @@
-Array.prototype.has = function(e){for(var i in this){if(this[i]==e) return true;}return false;};
+var hasElement = function(arr, e){for(var i in arr){if(arr[i]==e) return true;}return false;};
 
 var isArray = function(obj){
 	if(typeof obj !== "object") return false;
@@ -10,16 +10,22 @@ var log = function(){
 	console.log.apply(console, arguments);
 };
 
-template.helper('$stringify', function (content) {
+template.helper('stringify', function (content) {
 	return JSON.stringify(content);
 });
+
+template.helper('getSpaceType', function(type){
+	return spaceZoneTypes[type] || "*****";
+});
+
+template.helper('isArray', isArray);
 
 jQuery.fn.extend({
 	setable: function (val) {
 		val = val ? true : false;
 		var withDisableAttrEles = ["SELECT","INPUT"]; 
 		$(this).each(function(){
-			if(withDisableAttrEles.has(this.tagName)){
+			if(hasElement(withDisableAttrEles, this.tagName)){
 				this.disabled = !val;
 			}else{
 				if(val) $(this).removeClass("disabled");
@@ -34,18 +40,18 @@ jQuery.fn.extend({
 	enable: function () {
 		return $(this).setable(true);
 	},
-	checkList: function(checkHandler, checkHandlee, className) {
+	checkList: function(checkHandler, checkHandlee, className, afterCheck) {
 		className = className || "active";
 		var list = this;
+		var speed = 200;
 
 		list.set = function(obj){
 			if(obj.hasClass(className)){
-	            obj.removeClass(className).find(checkHandlee).slideUp();
+	            obj.removeClass(className).find(checkHandlee).slideUp(speed);
 	        }else{
-	            list.children("."+className).removeClass(className).find(checkHandlee).slideUp();
-	            obj.addClass(className).find(checkHandlee).slideDown();
+	            list.children("."+className).removeClass(className).find(checkHandlee).slideUp(speed);
+	            obj.addClass(className).find(checkHandlee).slideDown(speed);
 	        }
-
 	        return this;
 		};
 
@@ -71,6 +77,7 @@ jQuery.fn.extend({
 		list.delegate(checkHandler, "click", function(){
 	        var obj = $(this).parent();
 	        list.set(obj);
+	        afterCheck && afterCheck(obj);
 	    });
 
 	    return this;

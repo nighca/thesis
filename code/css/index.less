@@ -116,12 +116,15 @@ input[type="text"], input[type="password"], select{
 	right: 0;
 	top: 0;
 
+	overflow-y: scroll;
+
 	text-shadow: 0 1px #000;
 	color: #CACACA;
 	background-color: #464646;
 
 	.objs{
 		border-bottom: 1px solid #222;
+		border-left: 1px solid #222;
 		.obj{
 			
 
@@ -147,19 +150,61 @@ input[type="text"], input[type="password"], select{
 			}
 			.body{
 				display: none;
-				padding: 20px;
+				padding: 12px 20px 6px;
 
-				/* border-bottom: 1px solid #4B4747;
-				border-top: 1px solid #3C3C3C; */
-
+				background-color: #3d3d3d;
 				box-shadow: inset 0px 0px 2px #222;
 
 				.infos{
 					.info{
 						padding: 4px 0;
+						
+						h4{
+							padding: 5px 0;
+							font-size: 14px;
+							cursor: pointer;
 
-						&:last-child{
+							.more-mark, .no-more-mark{
+								.inline_block;
+								width: 8px;
+								text-align: center;
+								float: right;
+							}
+							.more-mark{
+								color: #56A1DB;
+							}
+							.no-more-mark{
+								display: none;
+							}
 						}
+						ul{
+							display: none;
+							padding-left: 10px;
+							list-style: square inside;
+							border-left: 2px dotted #CACACA;
+							margin-left: 2px;
+							li{
+								padding: 4px 0;
+								font-size: 12px;
+							}
+						}
+						p{
+							display: none;
+							padding: 4px 0;
+							font-size: 12px;
+						}
+						strong{
+
+						}
+						.name{
+							margin-left: 5px;
+						}
+						.val{
+							color: #56A1DB;
+						}
+					}
+					.current{
+						color: #f7f7f7;
 					}
 				}
 			}
