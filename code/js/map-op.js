@@ -238,3 +238,63 @@ function disableSpaceSelect(e){
   e && e.clean();
   return null;
 }
+
+function showSpaceZone(map, zone, afterShow){
+  switch(zone.type){
+    case 1:
+      //do sth...
+      var center = new google.maps.LatLng(zone.center.lat, zone.center.lng);
+      var radius = zone.radius;
+      var circle = drawCircle(map, center, radius);
+      break;
+    case 2:
+      //do sth...
+      var points = [];
+      for (var i = 0, l = zone.points.length; i < l; i++) {
+        var point = new google.maps.LatLng(zone.points[i].lat, zone.points[i].lng);
+        points.push(point);
+      };
+      var center = points[0];
+      var radius = zone.radius;
+      var polyline = drawPolyline(map, points);
+      var circle = drawCircle(map, center, radius);
+      break;
+    case 3:
+      //do sth...
+      var points = [];
+      for (var i = 0, l = zone.points.length; i < l; i++) {
+        var point = new google.maps.LatLng(zone.points[i].lat, zone.points[i].lng);
+        points.push(point);
+      };
+      var center = points[0];
+      var radius = zone.radius;
+      var polygon = drawPolygon(map, points, false);
+      var circle = drawCircle(map, center, radius);
+      break;
+    case 4:
+      //do sth...
+      var points = [];
+      for (var i = 0, l = zone.points.length; i < l; i++) {
+        var point = new google.maps.LatLng(zone.points[i].lat, zone.points[i].lng);
+        points.push(point);
+      };
+      var polygon = drawPolygon(map, points, true);
+      break;
+    default:
+      //do sth...
+      break;
+  }
+
+  afterShow && afterShow();
+}
+
+function showSpaceZones(map, zones, afterShow){
+  var l = zones.length;
+  $.each(zones, function(i,zone){
+    if(i<l-1){
+      showSpaceZone(map, zone);
+    }else{
+      showSpaceZone(map, zone, afterShow);
+    }
+  });
+}

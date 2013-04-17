@@ -3,6 +3,7 @@ var map;
 var e;
 var et;
 
+var objList = [];
 var rightList;
 
 /**
@@ -136,8 +137,14 @@ $(function() {
     $("#objs").delegate("li", "mouseleave", function(){
         $(this).removeClass("current");
     });
+
+    var addObj = function(obj){
+        objList.push(obj);
+        rightList.addNode(template.render('obj-template', obj));
+    };
     $.each(localStorage, function(name, cnt){
-        rightList.addNode(template.render('obj-template', (new TimeSpaceObj()).load(name)));
+        var obj = (new TimeSpaceObj()).load(name)
+        addObj(obj);
     });
 
     //show title
@@ -198,6 +205,8 @@ $(function() {
         mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
         typeIn.disable().val(0);
         nameIn.val("");
+
+        currentObj = new TimeSpaceObj();
 
         e = disableSpaceSelect(e);
         et = disablePeriodSelect(et);
@@ -313,16 +322,16 @@ $(function() {
         console.log(currentObj);
         currentObj.save();
 
-        rightList.addNode(template.render('obj-template', currentObj));
+        addObj(currentObj);
 
         init();
     });
 
     $("#timeline-in").click(function(){
-        zoomIn(tm, 0);
+        zoomIn(tm.timeline, 0);
     });
     $("#timeline-out").click(function(){
-        zoomOut(tm, 0);
+        zoomOut(tm.timeline, 0);
     });
     
 });
