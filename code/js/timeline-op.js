@@ -1,13 +1,12 @@
-var zoom = function (timemap, bandIndex, InOut) {
+var zoom = function (timeline, bandIndex, InOut) {
 	try{
-		if(typeof InOut !== "boolean" || typeof timemap !== "object" || typeof bandIndex !== "number"){
+		if(typeof InOut !== "boolean" || typeof timeline !== "object" || typeof bandIndex !== "number"){
 			throw new Error("Wrong arguments for zoom!")
 		}
 	} catch (e) {
 		alert(e)
 	}
 
-	var timeline = timemap.timeline;
 	var Eband = timeline.getBand(bandIndex)._div;
 
 	var Etimeline = timeline._containerDiv;
@@ -17,12 +16,12 @@ var zoom = function (timemap, bandIndex, InOut) {
 	return timeline.zoom(InOut, x, y, Eband);
 };
 
-var zoomIn = function(timemap, bandIndex){
-	return zoom(timemap, bandIndex, true);
+var zoomIn = function(timeline, bandIndex){
+	return zoom(timeline, bandIndex, true);
 };
 
-var zoomOut = function(timemap, bandIndex){
-	return zoom(timemap, bandIndex, false);
+var zoomOut = function(timeline, bandIndex){
+	return zoom(timeline, bandIndex, false);
 };
 
 function enablePeriodSelect(timeline, afterSelect){
@@ -34,6 +33,8 @@ function enablePeriodSelect(timeline, afterSelect){
   	var startPos = 0;
     var band = tm.timeline._bands[0];
     var bandDIV = $(band._div);
+
+    var rectangle;
 
     var renderRec = function(event) {
         var A = SimileAjax.DOM.getEventRelativeCoordinates(event, this);
@@ -86,7 +87,6 @@ function enablePeriodSelect(timeline, afterSelect){
     var getDate = function(event) {
         var A = SimileAjax.DOM.getEventRelativeCoordinates(event, this);
         var date = band._ether.pixelOffsetToDate(A.x + band._viewOffset).valueOf();
-        qqq = date;//-------------------------------
 
         dates.add(date, A);
     };
@@ -130,4 +130,55 @@ function disablePeriodSelect(e){
 	e && e.clean();
 
 	return null;
+}
+
+function showTimeZone(timeline, zone, afterShow){
+    var band = timeline._bands[0];
+    var bandDIV = $(band._div);
+    var start = band._ether.dateToPixelOffset(zone.start);
+    var end = band._ether.dateToPixelOffset(zone.end);
+    log(start, end);//--------------------
+    var width = end - start;
+    var rectangle = $('<div class="time-period-rec"></div>');
+    rectangle.css({
+        left: start - SimileAjax.DOM.getPageCoordinates(band._div).left,
+        width: width
+    }).appendTo(bandDIV);
+
+  
+    afterShow && afterShow();
+
+    return {
+        getRectangle: function(){
+            return rectangle;
+        },
+        clean: function(){
+            rectangle.remove();
+        }
+    };
+}
+
+function showTimeZones(timeline, zones, afterShow){
+    var l = zones.length;
+    var rectangles = [];
+    $.each(zones, function(i,zone){
+        if(i<l-1){
+            var t = showTimeZone(timeline, zone);
+            rectangles.push(t.getRectangle());
+        }else{
+            var t = showTimeZone(timeline, zone, afterShow);
+            rectangles.push(t.getRectangle());
+        }
+    });
+
+    return {
+        getRectangles: function(){
+            return rectangles;
+        },
+        clean: function(){
+            $.each(rectangles, function(i, rectangle){
+                rectangle.remove();
+            });
+        }
+    };
 }
