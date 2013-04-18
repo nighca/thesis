@@ -87,7 +87,6 @@ function enablePeriodSelect(timeline, afterSelect){
     var getDate = function(event) {
         var A = SimileAjax.DOM.getEventRelativeCoordinates(event, this);
         var date = band._ether.pixelOffsetToDate(A.x + band._viewOffset).valueOf();
-        qqq = date;//-------------------------------
 
         dates.add(date, A);
     };
@@ -134,29 +133,52 @@ function disablePeriodSelect(e){
 }
 
 function showTimeZone(timeline, zone, afterShow){
-    var band = tm.timeline._bands[0];
+    var band = timeline._bands[0];
     var bandDIV = $(band._div);
     var start = band._ether.dateToPixelOffset(zone.start);
     var end = band._ether.dateToPixelOffset(zone.end);
     log(start, end);//--------------------
     var width = end - start;
-    var rectangle = $('<div id="time-period-rec" class="time-period-rec"></div>');
+    var rectangle = $('<div class="time-period-rec"></div>');
     rectangle.css({
-        left: start,
+        left: start - SimileAjax.DOM.getPageCoordinates(band._div).left,
         width: width
     }).appendTo(bandDIV);
 
   
     afterShow && afterShow();
+
+    return {
+        getRectangle: function(){
+            return rectangle;
+        },
+        clean: function(){
+            rectangle.remove();
+        }
+    };
 }
 
 function showTimeZones(timeline, zones, afterShow){
     var l = zones.length;
+    var rectangles = [];
     $.each(zones, function(i,zone){
         if(i<l-1){
-            showTimeZone(map, zone);
+            var t = showTimeZone(timeline, zone);
+            rectangles.push(t.getRectangle());
         }else{
-            showTimeZone(map, zone, afterShow);
+            var t = showTimeZone(timeline, zone, afterShow);
+            rectangles.push(t.getRectangle());
         }
     });
+
+    return {
+        getRectangles: function(){
+            return rectangles;
+        },
+        clean: function(){
+            $.each(rectangles, function(i, rectangle){
+                rectangle.remove();
+            });
+        }
+    };
 }

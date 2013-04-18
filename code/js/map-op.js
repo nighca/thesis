@@ -240,12 +240,13 @@ function disableSpaceSelect(e){
 }
 
 function showSpaceZone(map, zone, afterShow){
+  var overLays = {};
   switch(zone.type){
     case 1:
       //do sth...
       var center = new google.maps.LatLng(zone.center.lat, zone.center.lng);
       var radius = zone.radius;
-      var circle = drawCircle(map, center, radius);
+      overLays.circle = drawCircle(map, center, radius);
       break;
     case 2:
       //do sth...
@@ -256,8 +257,8 @@ function showSpaceZone(map, zone, afterShow){
       };
       var center = points[0];
       var radius = zone.radius;
-      var polyline = drawPolyline(map, points);
-      var circle = drawCircle(map, center, radius);
+      overLays.polyline = drawPolyline(map, points);
+      overLays.circle = drawCircle(map, center, radius);
       break;
     case 3:
       //do sth...
@@ -268,8 +269,8 @@ function showSpaceZone(map, zone, afterShow){
       };
       var center = points[0];
       var radius = zone.radius;
-      var polygon = drawPolygon(map, points, false);
-      var circle = drawCircle(map, center, radius);
+      overLays.polygon = drawPolygon(map, points, false);
+      overLays.circle = drawCircle(map, center, radius);
       break;
     case 4:
       //do sth...
@@ -278,7 +279,7 @@ function showSpaceZone(map, zone, afterShow){
         var point = new google.maps.LatLng(zone.points[i].lat, zone.points[i].lng);
         points.push(point);
       };
-      var polygon = drawPolygon(map, points, true);
+      overLays.polygon = drawPolygon(map, points, true);
       break;
     default:
       //do sth...
@@ -286,15 +287,42 @@ function showSpaceZone(map, zone, afterShow){
   }
 
   afterShow && afterShow();
+
+  return {
+    getOverLays: function(){
+      return overLays;
+    },
+    clean: function(){
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
+    }
+  };
 }
 
 function showSpaceZones(map, zones, afterShow){
   var l = zones.length;
+  var overLaysArr = [];
   $.each(zones, function(i,zone){
     if(i<l-1){
-      showSpaceZone(map, zone);
+      var t = showSpaceZone(map, zone);
+      overLaysArr.push(t.getOverLays());
     }else{
-      showSpaceZone(map, zone, afterShow);
+      var t = showSpaceZone(map, zone, afterShow);
+      overLaysArr.push(t.getOverLays());
     }
   });
+
+  return {
+    getOverLaysArr: function(){
+      return overLaysArr;
+    },
+    clean: function(){
+      $.each(overLaysArr, function(i, overLays){
+        $.each(overLays, function(key, val){
+          destroyOverLay(val);
+        });
+      });
+    }
+  };
 }

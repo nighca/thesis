@@ -123,8 +123,26 @@ $(function() {
  */
 
  $(function(){
+    var maper, timeliner;
     rightList = $("#objs").checkList(".head", ".body", null, function(obj){
         obj.find(".cnt").hide(200);
+        $(this).find(".more-mark").show();
+        $(this).find(".no-more-mark").hide();
+
+        var name = obj.find("[name=name]").text();
+
+        var chosenObj;
+        for (var i = objList.length - 1; i >= 0; i--) {
+            if(objList[i].name == name){
+                chosenObj = objList[i];
+                break;
+            }
+        };
+
+        maper && maper.clean && maper.clean();
+        timeliner && timeliner.clean && timeliner.clean();
+        maper = showTimeZones(tm.timeline, chosenObj.timeZone.zones, function(){});
+        timeliner = showSpaceZones(map, chosenObj.spaceZone.zones, function(){});
     });
     $("#objs").delegate(".ttl", "click", function(){
         $(this).next(".cnt").slideToggle(200);
@@ -207,6 +225,9 @@ $(function() {
         nameIn.val("");
 
         currentObj = new TimeSpaceObj();
+
+        maper && maper.clean && maper.clean();
+        timeliner && timeliner.clean && timeliner.clean();
 
         e = disableSpaceSelect(e);
         et = disablePeriodSelect(et);
