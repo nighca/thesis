@@ -1,6 +1,8 @@
 var spaceZoneTypes = ["Null", "point", "polyline", "polygon"];
 
-var defaultRadius = 10000;
+var defaultRadius = 100;
+
+var datasetId = "timeSpaceObjs";
 
 var pointMarkerIcon = {
   path: google.maps.SymbolPath.CIRCLE,

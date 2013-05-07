@@ -38,6 +38,16 @@ SpaceZone.prototype.add = function(){
         this.zones.push(arguments[i]);
     }
 };
+SpaceZone.prototype.getPos = function(){
+    if(this.zones.length < 1) return null;
+    var zone = this.zones[0];
+    switch(zone.type){
+        case 1: return zone.center; break;
+        case 2: return zone.points[0]; break;
+        case 3: return zone.points[0]; break;
+        default: return null; break;
+    }
+};
 
 var TimeSpaceObj = function () {
     this.name = "";
@@ -80,6 +90,11 @@ TimeSpaceObj.prototype.delete = function() {
     return this;
 };
 
+TimeSpaceObj.prototype.getPos = function() {
+    if(!this.spaceZone) return null;
+    return this.spaceZone.getPos();
+};
+
 var parseOverLay = function(type, overLays){
     var spaceZone = {
         type: type
@@ -90,14 +105,14 @@ var parseOverLay = function(type, overLays){
             break;
         case 1:
             var tp = overLays.circle.center;
-            spaceZone.center = new Point(tp.jb, tp.kb);
+            spaceZone.center = new Point(tp.kb, tp.lb);
             //spaceZone.radius = overLays.circle.radius;
             break;
         case 2:
             var tps = overLays.polyline.getPath().b;
             var points = [];
             for(var i=0,l=tps.length;i<l;i++){
-                points.push(new Point(tps[i].jb, tps[i].kb));
+                points.push(new Point(tps[i].kb, tps[i].lb));
             }
             spaceZone.points = points;
             //spaceZone.radius = overLays.circle.radius;
@@ -106,7 +121,7 @@ var parseOverLay = function(type, overLays){
             var tps = overLays.polygon.getPath().b;
             var points = [];
             for(var i=0,l=tps.length;i<l;i++){
-                points.push(new Point(tps[i].jb, tps[i].kb));
+                points.push(new Point(tps[i].kb, tps[i].lb));
             }
             spaceZone.points = points;
             break;
@@ -118,4 +133,40 @@ var parseOverLay = function(type, overLays){
 
 var parsePeriod = function(period){
     return period;
+};
+
+TimeMap.prototype.showObjs = function(objs){
+    var timeline = this.timeline;
+
+    var dts = this.datasets;
+    if(!dts[datasetId]) return false;
+    var dt = dts[datasetId];
+
+    var certainDate;
+    var items = [];
+    $.each(objs, function(i, obj){
+        $.each(obj.timeZone.zones, function(j, timeZone){
+            var item = {
+                start: timeFormat(timeZone.start),
+                end: timeFormat(timeZone.end),
+                title: obj.name
+            };
+            certainDate = (timeZone.start + timeZone.end)/2;
+            var pos = obj.getPos();
+
+            if(pos){
+                item["point"] = {
+                    lat: pos.lat,
+                    lon: pos.lng
+                }
+                items.push(item);
+            }
+        });
+    });
+
+    dt.clear();
+    dt.loadItems(items);
+
+    certainDate && timeline.getBand(0).setCenterVisibleDate(new Date(certainDate));
+    timeline.layout();
 };

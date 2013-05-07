@@ -26,7 +26,7 @@ $(function() {
     var eventSource = new Timeline.DefaultEventSource();
     var bands = [
     Timeline.createBandInfo({
-        date: "Jun 28 2006 00:00:00 GMT",
+        //date: "Jun 28 2006 00:00:00 GMT",
         width: "70%",
         intervalUnit: Timeline.DateTime.YEAR,
         intervalPixels: 100,
@@ -85,7 +85,7 @@ $(function() {
         })
     }),
     Timeline.createBandInfo({
-        date: "Jun 28 2006 00:00:00 GMT",
+        //date: "Jun 28 2006 00:00:00 GMT",
         width: "30%",
         intervalUnit: Timeline.DateTime.CENTURY,
         intervalPixels: 200,
@@ -154,9 +154,23 @@ $(function() {
         $(this).removeClass("current");
     });
 
-    $.each(objList, function(i, obj){
-        rightList.addNode(template.render('obj-template', obj));
-    });
+    var refreshList = function(list){
+        if(list) objList = list;
+        tm.showObjs(objList);
+        rightList.clear();
+        $.each(objList, function(i, obj){
+            rightList.addNode(template.render('obj-template', obj));
+        });
+    };
+
+    var refreshFromRemote = function(){
+        getData("php/get.php", function(ret){
+            setData(ret);
+            refreshList();
+        });
+    };
+
+    refreshList();
 
     //show title
     var recorder = 0;
@@ -267,15 +281,7 @@ $(function() {
 
     nameIn.keyup(function(){
         var hasName = $(this).val();
-        typeIn.setable(hasName);
         timelineSelect.setable(hasName);
-    });
-
-    typeIn.change(function(){
-        var type = parseInt($(this).val());
-
-        e = disableSpaceSelect(e);
-        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit").trigger("click");
     });
 
     timelineSelect.click(function(){
@@ -283,9 +289,24 @@ $(function() {
             et = disablePeriodSelect(et);
         }
         et = enablePeriodSelect(tm.timeline, function(){
-            //log(et.getPeriod());
-            timelineSelectOk.enable();
+            typeIn.enable();
         });
+    });
+
+    timelineSelectOk.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        var timeZone = parsePeriod(et.getPeriod());
+
+        currentObj.addTimeZone(timeZone);
+        createOk.enable();
+    });
+
+    typeIn.change(function(){
+        var type = parseInt($(this).val());
+
+        e = disableSpaceSelect(e);
+        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit").trigger("click");
     });
 
     mapSelect.click(function() {
@@ -308,16 +329,8 @@ $(function() {
         var spaceZone = parseOverLay(type, e.getOverLays());
 
         currentObj.addSpaceZone(spaceZone);
-        createOk.enable();
-    });
-
-    timelineSelectOk.click(function() {
-        if($(this).hasClass("disabled")) return false;
-
-        var timeZone = parsePeriod(et.getPeriod());
-
-        currentObj.addTimeZone(timeZone);
-        createOk.enable();
+        log(spaceZone, currentObj.spaceZone);//-------------------
+        timelineSelectOk.enable();
     });
 
     createOk.click(function() {
@@ -327,9 +340,11 @@ $(function() {
 
         currentObj.name = name;
         currentObj.id = name;
-        currentObj.save();
+        currentObj.save(function(){
+            refreshFromRemote();
+        });
 
-        addObj(currentObj);
+        log(currentObj.spaceZone);//------------------
 
         init();
     });

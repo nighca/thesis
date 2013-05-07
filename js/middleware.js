@@ -1,7 +1,7 @@
 var objList = [];
 
 var dataset = {
-    id: "timeSpaceObjs",
+    id: datasetId,
     title: "TimeSpaceObjs",
     theme: "orange",
     type: "basic",
@@ -38,7 +38,7 @@ var parseSpace = function(space){
             //spaceZone.radius = overLays.circle.radius;
             break;
         case 3:
-            var tps = space.coordinates;
+            var tps = space.coordinates[0];
             var points = [];
             for(var i=0,l=tps.length;i<l-1;i++){
                 points.push(new Point(tps[i][0], tps[i][1]));
@@ -113,25 +113,8 @@ var spaceZoneToWKT = function(spaceZone){
     return wktStr;
 };
 
-var dateFormat = function(t, sep){
-	var ds = [];
-	var y = t.getFullYear();
-	ds.push(y);
-	var m = t.getMonth() + 1;
-	ds.push(m<10 ? "0"+m : "" + m);
-	var d = t.getDate();
-	ds.push(d<10 ? "0"+d : "" + d);
-	sep = sep || "";
-	return ds.join(sep);
-};
-
-var timeFormat = function(t){
-	var d = new Date(t);
-	return dateFormat(d, "-");
-};
-
-TimeSpaceObj.prototype.save = function() {
-    saveToLocal(this.name, this, "TimeSpaceObj");
+TimeSpaceObj.prototype.save = function(callback, fail) {
+    //saveToLocal(this.name, this, "TimeSpaceObj");
 
     var objId = this.id;
 
@@ -157,8 +140,10 @@ TimeSpaceObj.prototype.save = function() {
 		    	"space": space
 		    }, "php/op.php", function(res){
 		    	log(res);
+                callback && callback();
 		    }, function(err){
 		    	log(err);
+                fail && fail();
 		    });
     	};
     };

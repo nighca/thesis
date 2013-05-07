@@ -30,6 +30,23 @@ var getData = function (url, success, fail, data) {
     });
 };
 
+var dateFormat = function(t, sep){
+	var ds = [];
+	var y = t.getFullYear();
+	ds.push(y);
+	var m = t.getMonth() + 1;
+	ds.push(m<10 ? "0"+m : "" + m);
+	var d = t.getDate();
+	ds.push(d<10 ? "0"+d : "" + d);
+	sep = sep || "";
+	return ds.join(sep);
+};
+
+var timeFormat = function(t){
+	var d = new Date(t);
+	return dateFormat(d, "-");
+};
+
 var saveToLocal = function (key, value, nameSpace) {
 	if(typeof key !== "string") return false;
 	if(nameSpace) key = nameSpace + "$" + key;
@@ -140,7 +157,11 @@ jQuery.fn.extend({
 		};
 
 		list.addNode = function(obj){
-			list.append(obj);
+			return list.append(obj);
+		};
+
+		list.clear = function(){
+			list[0].innerHTML = "";
 		};
 
 		list.delegate(checkHandler, "click", function(){
@@ -149,6 +170,6 @@ jQuery.fn.extend({
 	        afterCheck && afterCheck(obj);
 	    });
 
-	    return this;
+	    return list;
 	}
 });

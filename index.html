@@ -16,6 +16,7 @@
   -->
     <script src="add-on/timemap.2.0.1/src/timemap.js" type="text/javascript"></script>
     <script src="add-on/timemap.2.0.1/src/manipulation.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/config.js"></script>
     <script src="js/my-extend.js" type="text/javascript"></script>
     <script src="js/TimeSpaceObj.js" type="text/javascript"></script>
     <script src="js/middleware.js" type="text/javascript"></script>
@@ -80,84 +81,80 @@
       </div>
     
     </div>
-
+    
+    <script id="info-template" type="text/html">
+      <% if (typeof info === "string" || typeof info === "number") { %>
+      <p class="cnt val"><%=info%></p>
+      <% } else if (isArray(info)) {%>
+        <% if (info.length > 0) { %>
+          <ul class="cnt">
+          <% for (var i=0;i<info.length;i++) { %>
+            <li class="array-list-<%=i+1%>">
+            <h4 class="ttl">
+              <%=i+1%>
+              <% if (isArray(info[i])) { %>
+                (<%=info[i].length%>)
+              <% } %>
+              <span class="more-mark">+</span><span class="no-more-mark">-</span>
+            </h4>
+            <% include("info-template", {info: info[i]}) %>
+            </li>
+          <% } %>
+          </ul>
+        <% } else { %>
+          <p class="cnt val">None</p>
+        <% } %>
+      <% } else if (typeof info === "object") {%>
+        <ul class="cnt">
+        <% for (var key in info) { %>
+          <li>
+          <h4 class="ttl">
+            <%=key%>
+            <% if (isArray(info[key])) { %>
+              (<%=info[key].length%>)
+            <% } %>
+            <span class="more-mark">+</span><span class="no-more-mark">-</span>
+          </h4>
+          <% if (key == "type") { %>
+            <% include("info-template", {info: getSpaceType(info[key])}) %>
+            <% }else{ %>
+            <% include("info-template", {info: info[key]}) %>
+            <% } %>
+          <% } %>
+          </li>
+        </ul>
+      <% } %>
+    </script>
+    <script id="obj-template" type="text/html">
+    <li class="obj">
+      <div class="head" name="name"><%=name%></div>
+      <div class="body">
+        <ul class="infos">
+          <li class="info"><strong>name: </strong><span class="name val"><%=name%></span></li>
+          <li class="info">
+            <h4 class="ttl">space-zones (<%=spaceZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+            <% include("info-template", {info: spaceZone.zones}) %>
+          </li>
+          <li class="info">
+            <h4 class="ttl">time-zones (<%=timeZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+            <% include("info-template", {info: timeZone.zones}) %>
+          </li>
+          <li class="info">
+            <h4 class="ttl">tags (<%=tags.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+            <% include("info-template", {info: tags}) %>
+          </li>
+        </ul>
+      </div>
+    </li>        
+    </script>
     <div class="side-container">
       <ul id="objs" class="objs">
-
-        <script id="info-template" type="text/html">
-          <% if (typeof info === "string" || typeof info === "number") { %>
-          <p class="cnt val"><%=info%></p>
-          <% } else if (isArray(info)) {%>
-            <% if (info.length > 0) { %>
-              <ul class="cnt">
-              <% for (var i=0;i<info.length;i++) { %>
-                <li class="array-list-<%=i+1%>">
-                <h4 class="ttl">
-                  <%=i+1%>
-                  <% if (isArray(info[i])) { %>
-                    (<%=info[i].length%>)
-                  <% } %>
-                  <span class="more-mark">+</span><span class="no-more-mark">-</span>
-                </h4>
-                <% include("info-template", {info: info[i]}) %>
-                </li>
-              <% } %>
-              </ul>
-            <% } else { %>
-              <p class="cnt val">None</p>
-            <% } %>
-          <% } else if (typeof info === "object") {%>
-            <ul class="cnt">
-            <% for (var key in info) { %>
-              <li>
-              <h4 class="ttl">
-                <%=key%>
-                <% if (isArray(info[key])) { %>
-                  (<%=info[key].length%>)
-                <% } %>
-                <span class="more-mark">+</span><span class="no-more-mark">-</span>
-              </h4>
-              <% if (key == "type") { %>
-                <% include("info-template", {info: getSpaceType(info[key])}) %>
-                <% }else{ %>
-                <% include("info-template", {info: info[key]}) %>
-                <% } %>
-              <% } %>
-              </li>
-            </ul>
-          <% } %>
-        </script>
-        <script id="obj-template" type="text/html">
-
-        <li class="obj">
-          <div class="head" name="name"><%=name%></div>
-          <div class="body">
-            <ul class="infos">
-              <li class="info"><strong>name: </strong><span class="name val"><%=name%></span></li>
-              <li class="info">
-                <h4 class="ttl">space-zones (<%=spaceZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
-                <% include("info-template", {info: spaceZone.zones}) %>
-              </li>
-              <li class="info">
-                <h4 class="ttl">time-zones (<%=timeZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
-                <% include("info-template", {info: timeZone.zones}) %>
-              </li>
-              <li class="info">
-                <h4 class="ttl">tags (<%=tags.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
-                <% include("info-template", {info: tags}) %>
-              </li>
-            </ul>
-          </div>
-        </li>        
-
-        </script>
       </ul>
     </div>
     
 	</body>
   <script type="text/javascript" src="php/get.php?callback=setData"></script>
   <!--<script type="text/javascript" src="js/dataset.js"></script>-->
-  <script type="text/javascript" src="js/config.js"></script>
   <script type="text/javascript" src="js/timeline-op.js"></script>
   <script type="text/javascript" src="js/map-op.js"></script>
 	<script type="text/javascript" src="js/main.js"></script>
