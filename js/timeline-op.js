@@ -55,12 +55,13 @@ function enablePeriodSelect(timeline, afterSelect){
         }
     };
 
+    var temp;
     dates.add = function(date, pos){
-    	this.push(date);
-
-    	var temp;
-
-    	if(this.length==1){
+        var l = this.length;
+        log(l, this);//------------------
+    	if(l==0){
+            this.push(date);
+            rectangle && rectangle.remove();
     		rectangle = $('<div id="time-period-rec" class="time-period-rec"></div>');
     		startPos = pos.x;
     		rectangle.css("left",startPos).appendTo(bandDIV);
@@ -73,14 +74,17 @@ function enablePeriodSelect(timeline, afterSelect){
 		    }) - 1;
     	}
 
-        if(this.length>=2){
+        if(l==1){
+            this.push(date);
         	bandDIV.off("mousemove", renderRec);
         	listeners.splice(temp, 1);
         	afterSelect && afterSelect();
         }
 
-        if(this.length>2){
+        if(l>1){
+            this.splice(0,1);
         	this.splice(0,1);
+            this.add(date, pos);
         }
     };
 
@@ -110,15 +114,15 @@ function enablePeriodSelect(timeline, afterSelect){
 
 	      	return period;
 	    },
-	    /*getListeners: function(){
-	      	return listeners;
-	    },*/
 	    clean: function(){
+            log(listeners);//--------------------------
 			$.each(listeners, function(i, listener){
 				listener["obj"].off(listener.event, listener.handler);
 			});
 
 	    	rectangle.remove();
+            log($(".time-period-rec"));//----------------------
+            $(".time-period-rec").remove();
 	    	while(dates.pop()>1);
 
 	    	return true;

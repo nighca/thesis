@@ -125,8 +125,8 @@ TimeSpaceObj.prototype.save = function(callback, fail) {
     	var timeZone = timeZones[i];
     	var begin = timeFormat(timeZone.start);
     	var end = timeFormat(timeZone.end);
-    	for (var i = spaceZones.length - 1; i >= 0; i--) {
-    		var spaceZone = spaceZones[i];
+    	for (var j = spaceZones.length - 1; j >= 0; j--) {
+    		var spaceZone = spaceZones[j];
     		var space = spaceZoneToWKT(spaceZone);
     		var type = spaceZoneTypes[spaceZone.type];
 

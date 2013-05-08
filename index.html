@@ -127,10 +127,10 @@
     </script>
     <script id="obj-template" type="text/html">
     <li class="obj">
-      <div class="head" name="name"><%=name%></div>
+      <div class="head"><%=name%></div>
       <div class="body">
         <ul class="infos">
-          <li class="info"><strong>name: </strong><span class="name val"><%=name%></span></li>
+          <li class="info"><strong>ID: </strong><span name="id" class="name val"><%=id%></span></li>
           <li class="info">
             <h4 class="ttl">space-zones (<%=spaceZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
             <% include("info-template", {info: spaceZone.zones}) %>

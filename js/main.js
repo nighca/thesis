@@ -76,12 +76,6 @@ $(function() {
         }, {
             pixelsPerInterval: 400,
             unit: Timeline.DateTime.CENTURY
-        }, {
-            pixelsPerInterval: 200,
-            unit: Timeline.DateTime.CENTURY
-        }, {
-            pixelsPerInterval: 100,
-            unit: Timeline.DateTime.CENTURY
         })
     }),
     Timeline.createBandInfo({
@@ -127,11 +121,11 @@ $(function() {
         obj.find(".more-mark").show();
         obj.find(".no-more-mark").hide();
 
-        var name = obj.find("[name=name]").text();
+        var id = obj.find("[name=id]").text();
 
         var chosenObj;
         for (var i = objList.length - 1; i >= 0; i--) {
-            if(objList[i].name == name){
+            if(objList[i].id == id){
                 chosenObj = objList[i];
                 break;
             }
@@ -188,6 +182,7 @@ $(function() {
     var createOk = $("#obj-create-ok");
 
     var currentObj = new TimeSpaceObj();
+    //currentObj = new TimeSpaceObj();//----------------------
 
     var enableSpaceSelect = function(type){
         var e;
