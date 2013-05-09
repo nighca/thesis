@@ -106,6 +106,46 @@ function enablePointSelect(map, afterSelect) {
   };
 }
 
+function enablePointSelectWithRadius(map, afterSelect) {
+  console.log("Point select");//--------------------
+  var overLays = {
+    "circle" : null
+  };
+  var listeners = {};
+
+  listeners["map"] = google.maps.event.addListener(map, 'click', function(event) {
+    if(overLays["circle"]){ //to release certain point
+      destroyOverLay(overLays["circle"]);
+      overLays["circle"] = null;
+    }
+
+    var circle = drawCircle(map, event.latLng, null, true);
+    overLays["circle"] = circle;
+
+    afterSelect && afterSelect();
+  });
+
+  
+  return {
+    getOverLays: function(){
+      return overLays;
+    },
+    getListeners: function(){
+      return listeners;
+    },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
+    },
+    type: 1
+  };
+}
+
 function enableLineSelect(map, afterSelect) {
   console.log("Line select");//--------------------
   var overLays = {
@@ -150,7 +190,90 @@ function enableLineSelect(map, afterSelect) {
   };
 }
 
-function enableBorderSelect(map, afterSelect) {
+function enableLineSelectWithRadius(map, afterSelect) {
+  console.log("Line select");//--------------------
+  var overLays = {
+    "circle" : null,
+    "polyline" : null
+  };
+  var listeners = {};
+  var points = [];
+  
+  listeners["map"] = google.maps.event.addListener(map, 'click', function(event) {
+    if(overLays["polyline"]){ //to release certain polyline
+      destroyOverLay(overLays["polyline"]);
+      overLays["polyline"] = null;
+    }
+
+    var pointNum = points.push(event.latLng);
+    overLays["polyline"] = drawPolyline(map, points, true);
+    if(pointNum==1){
+      overLays["circle"] = drawCircle(map, event.latLng, null, true);
+    }
+
+    afterSelect && afterSelect();
+  });
+  
+  return {
+    getOverLays: function(){
+      return overLays;
+    },
+    getListeners: function(){
+      return listeners;
+    },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
+    },
+    type: 2
+  };
+}
+
+function enablePolygonSelect(map, afterSelect) {
+  console.log("Polygon select");//--------------------
+  var overLays = {
+    "polygon" : null
+  };
+  var listeners = {};
+  var points = [];
+  
+  listeners["map"] = google.maps.event.addListener(map, 'click', function(event) {
+    if(overLays["polygon"]){ //to release certain polygon
+      destroyOverLay(overLays["polygon"]);
+      overLays["polygon"] = null;
+    }
+    points.push(event.latLng);
+    overLays["polygon"] = drawPolygon(map, points, true);
+
+    afterSelect && afterSelect();
+  });
+
+  return {
+    getOverLays: function(){
+      return overLays;
+    },
+    getListeners: function(){
+      return listeners;
+    },
+    clean: function(){
+      $.each(listeners, function(i, listener){
+        google.maps.event.removeListener(listener);
+      });
+
+      $.each(overLays, function(key, val){
+        destroyOverLay(val);
+      });
+    },
+    type: 4
+  };
+}
+
+function enablePolygonSelectWithRadius(map, afterSelect) {
   console.log("Border select");//--------------------
   var overLays = {
     "circle" : null,
@@ -192,45 +315,6 @@ function enableBorderSelect(map, afterSelect) {
       });
     },
     type: 3
-  };
-}
-
-function enablePolygonSelect(map, afterSelect) {
-  console.log("Polygon select");//--------------------
-  var overLays = {
-    "polygon" : null
-  };
-  var listeners = {};
-  var points = [];
-  
-  listeners["map"] = google.maps.event.addListener(map, 'click', function(event) {
-    if(overLays["polygon"]){ //to release certain polygon
-      destroyOverLay(overLays["polygon"]);
-      overLays["polygon"] = null;
-    }
-    points.push(event.latLng);
-    overLays["polygon"] = drawPolygon(map, points, true);
-
-    afterSelect && afterSelect();
-  });
-
-  return {
-    getOverLays: function(){
-      return overLays;
-    },
-    getListeners: function(){
-      return listeners;
-    },
-    clean: function(){
-      $.each(listeners, function(i, listener){
-        google.maps.event.removeListener(listener);
-      });
-
-      $.each(overLays, function(key, val){
-        destroyOverLay(val);
-      });
-    },
-    type: 4
   };
 }
 

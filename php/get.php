@@ -28,7 +28,7 @@ function get(){
 }
 
 function getWithin(){
-    @$polygon = $_POST['polygon'];
+    @$area = $_GET['area'];
 
     $db = new DB();
 
@@ -36,7 +36,7 @@ function getWithin(){
     $sql .= " timea join node on timea.idarti=node.nid";
     $sql .= " left join geo on timea.idgeo=geo.idgeo";
     $sql .= " left join (select * from point union select * from polyline union select * from polygon) as space on geo.idgeo=space.idgeo";
-    $sql .= " where ST_Contains(GeomFromText('$polygon'),space.item)";
+    $sql .= " where ST_Contains(ST_GeomFromText('$area',4326),space.item)";
 
     @$getInfo = $db->getObjListBySql($sql);
     $ret = count($getInfo)>0 ? json_encode($getInfo) : "null";
@@ -50,12 +50,16 @@ function getWithin(){
 }
 
 function getNear(){
+    @$area = $_GET['area'];
+    @$dist = $_GET['dist'];
+
     $db = new DB();
 
     $sql = "select extract(epoch FROM timea.begin) as begin, extract(epoch FROM timea.end) as end, ST_AsGeoJSON(space.item) as space, node.title, node.type, node.nid as id from";
     $sql .= " timea join node on timea.idarti=node.nid";
     $sql .= " left join geo on timea.idgeo=geo.idgeo";
     $sql .= " left join (select * from point union select * from polyline union select * from polygon) as space on geo.idgeo=space.idgeo";
+    $sql .= " where ST_DWithin(ST_Transform(ST_GeomFromText('$area',4326),26986),ST_Transform(space.item,26986),$dist)";
 
     @$getInfo = $db->getObjListBySql($sql);
     $ret = count($getInfo)>0 ? json_encode($getInfo) : "null";

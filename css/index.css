@@ -250,6 +250,7 @@ input[type="text"]:disabled,input[type="password"]:disabled,select:disabled{colo
 .ops{position:absolute;top:4px;z-index:100;overflow:hidden;font-size:14px;background-color:#ffffff;color:#333333;box-shadow:1px 1px 4px rgba(100, 100, 100, 0.75);-moz-box-shadow:1px 1px 4px rgba(100, 100, 100, 0.75);-webkit-box-shadow:1px 1px 4px rgba(100, 100, 100, 0.75);list-style:none;}.ops [class^="icon-"],.ops [class*=" icon-"]{width:16px;height:16px;}
 .ops.timeline-ops{left:4px;}
 .ops.map-ops{left:90px;}
+.ops.search-ops{top:40px;left:90px;}
 .ops .op{display:inline-block;_zoom:1;*zoom:1;_display:inline;*display:inline;float:left;padding:6px;cursor:pointer;}.ops .op:active{background-color:#f0f0f0;}
 .ops .op.disabled,.ops .op:disabled{color:#c2c2c2;background:none;}
 .ops .vals-in{float:left;display:none;}.ops .vals-in .val-in{float:left;height:28px;}

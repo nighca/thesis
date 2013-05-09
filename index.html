@@ -77,6 +77,35 @@
           </form>
         </ul>
 
+        <ul class="ops search-ops">
+          <li id="show-all" class="op" ntitle="显示所有对象">
+            <i class="icon-refresh"></i>
+          </li>
+          <li id="search-objs" class="op" ntitle="按条件查找对象">
+            <i class="icon-search"></i>
+          </li>
+          <form id="search-vals-in" class="vals-in">
+            <select name="type" id="search-type-in" class="val-in">
+              <option value="0">搜索条件</option>
+              <option value="within">包含在</option>
+              <option value="near">附近</option>
+            </select>
+            <select name="areatype" id="" class="val-in" disabled="disabled">
+              <option value="0">位置</option>
+              <option value="1">点</option>
+              <option value="2">折线</option>
+              <option value="3">多边形</option>
+            </select>
+            <input name="dist" type="text" class="val-in" placeholder="距离(m)" disabled="disabled" />
+            <li id="search-select" class="op disabled" ntitle="select a zone on map">
+              <i class="icon-edit"></i>
+            </li>
+            <li id="search-select-ok" class="op disabled" ntitle="use the selected zone">
+              <i class="icon-ok"></i>
+            </li>
+          </form>
+        </ul>
+
         <div id="map" class="map"></div>
       </div>
     

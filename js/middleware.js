@@ -25,23 +25,21 @@ var parseSpace = function(space){
             break;
         case 1:
             var tp = space.coordinates;
-            spaceZone.center = new Point(tp[0], tp[1]);
-            //spaceZone.radius = overLays.circle.radius;
+            spaceZone.center = new Point(tp[1], tp[0]);
             break;
         case 2:
             var tps = space.coordinates;
             var points = [];
             for(var i=0,l=tps.length;i<l;i++){
-                points.push(new Point(tps[i][0], tps[i][1]));
+                points.push(new Point(tps[i][1], tps[i][0]));
             }
             spaceZone.points = points;
-            //spaceZone.radius = overLays.circle.radius;
             break;
         case 3:
             var tps = space.coordinates[0];
             var points = [];
             for(var i=0,l=tps.length;i<l-1;i++){
-                points.push(new Point(tps[i][0], tps[i][1]));
+                points.push(new Point(tps[i][1], tps[i][0]));
             }
             spaceZone.points = points;
             break;
@@ -81,32 +79,44 @@ var setData = function(items){
     };
 };
 
-var spaceZoneToWKT = function(spaceZone){
+var spaceZoneToWKT = function(spaceZone, withRadius){
 	var wktStr;
     switch(spaceZone.type){
     	case 0: break;
     	case 1: 
-    		wktStr = "POINT (" + spaceZone.center.lat + " " + spaceZone.center.lng + ")";
+    		wktStr = "POINT (" + spaceZone.center.lng + " " + spaceZone.center.lat + ")";
     		break;
     	case 2:
     		wktStr = "LINESTRING (";
     		for (var i = 0, l = spaceZone.points.length; i < l; i++) {
     			var point = spaceZone.points[i];
-    			wktStr += point.lat + " " + point.lng;
+    			wktStr += point.lng + " " + point.lat;
     			if(i!=l-1) wktStr += ",";
     		}
     		wktStr += ")";
     		break;
     	case 3:
-    		wktStr = "POLYGON ((";
-    		for (var i = 0, l = spaceZone.points.length; i < l; i++) {
-    			var point = spaceZone.points[i];
-    			wktStr += point.lat + " " + point.lng;
-    			wktStr += ",";
-    		}
-    		var begin = spaceZone.points[0];
-    		wktStr += begin.lat + " " + begin.lng;
-    		wktStr += "))";
+            if(!withRadius){
+        		wktStr = "POLYGON ((";
+        		for (var i = 0, l = spaceZone.points.length; i < l; i++) {
+        			var point = spaceZone.points[i];
+        			wktStr += point.lng + " " + point.lat;
+        			wktStr += ",";
+        		}
+        		var begin = spaceZone.points[0];
+        		wktStr += begin.lng + " " + begin.lat;
+        		wktStr += "))";
+            }else{
+                wktStr = "LINESTRING (";
+                for (var i = 0, l = spaceZone.points.length; i < l; i++) {
+                    var point = spaceZone.points[i];
+                    wktStr += point.lng + " " + point.lat;
+                    wktStr += ",";
+                }
+                var begin = spaceZone.points[0];
+                wktStr += begin.lng + " " + begin.lat;
+                wktStr += ")";
+            }
     		break;
     }
 

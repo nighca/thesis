@@ -1,7 +1,8 @@
 var tm;
 var map;
-var e;
-var et;
+var e; //select area on map
+var et; //select area on timeline
+var es; //select area on map while search
 
 var rightList;
 
@@ -181,6 +182,16 @@ $(function() {
     var timelineSelectOk = $("#timeline-select-ok");
     var createOk = $("#obj-create-ok");
 
+    var showAll = $("#show-all");
+    var searchForm = $("#search-vals-in");
+    var searchObjs = $("#search-objs");
+    var searchTypeIn = searchForm.find("[name=type]");
+    var searchAreaTypeIn = searchForm.find("[name=areatype]");
+    var searchDistIn = searchForm.find("[name=dist]");
+    var searchSelect = $("#search-select");
+    var searchSelectOk = $("#search-select-ok");
+
+
     var currentObj = new TimeSpaceObj();
     //currentObj = new TimeSpaceObj();//----------------------
 
@@ -212,6 +223,48 @@ $(function() {
         return e;
     };
 
+    var enableSearchSelect = function(type, areaType){
+        var e;
+
+        var afterSelect = function(){
+            var circle = es.getOverLays()["circle"];
+            var showRadius = function() {
+                radius = circle.getRadius();
+                searchDistIn.val(distFormat(radius, 1).format(" "));
+            };
+            google.maps.event.addListener(circle, 'radius_changed', showRadius);
+            showRadius();
+            searchSelectOk.enable();
+        };
+
+        switch(areaType){
+            case 0:
+                return null;
+                break;
+            case 1:
+                e = enablePointSelectWithRadius(map, afterSelect);
+                break;
+            case 2:
+                e = enableLineSelectWithRadius(map, afterSelect);
+                break;
+            case 3:
+                if(type=="within"){
+                    e = enablePolygonSelect(map, afterSelect);
+                }else{
+                    e = enablePolygonSelectWithRadius(map, afterSelect);
+                }
+                break;
+            default:
+                return null;
+        }
+        searchSelect.find("i").removeClass("icon-edit").addClass("icon-trash");
+        return e;
+    };
+
+    var disableSearchSelect = function(e){
+        return disableSpaceSelect(e);
+    };
+
     var init = function(){
         createOk.disable();
         timelineSelectOk.disable();
@@ -228,6 +281,19 @@ $(function() {
 
         e = disableSpaceSelect(e);
         et = disablePeriodSelect(et);
+    };
+
+    var initSearch = function(){
+        searchSelectOk.disable();
+        searchSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
+        searchDistIn.val("");
+        searchAreaTypeIn.disable().val(0);
+        searchTypeIn.val(0);
+
+        maper && maper.clean && maper.clean();
+        timeliner && timeliner.clean && timeliner.clean();
+
+        es = disableSearchSelect(es);
     };
 
     $("[ntitle]").hover(function(event){
@@ -350,5 +416,84 @@ $(function() {
     $("#timeline-out").click(function(){
         zoomOut(tm.timeline, 0);
     });
+
+    showAll.click(function(){
+        refreshFromRemote();
+    });
+
+    searchObjs.click(function(){
+        searchForm.toggle();
+        //init();
+    });
+
+    searchTypeIn.change(function(){
+        var type = $(this).val();
+        switch(type){
+            case "within": 
+                searchAreaTypeIn.disable().val(3);
+                searchSelect.enable();
+                break;
+            case "near": 
+                searchAreaTypeIn.enable().val(0);
+                break;
+            default: ;
+        }
+    });
+
+    searchAreaTypeIn.change(function(){
+        if($(this).val()){
+            //searchDistIn.enable();
+            searchSelect.enable();
+        }
+    });
+
+    searchDistIn.keyup(function(){
+        var val = $(this).val();
+        var numPattern = /^\d+(\.\d+)?$/;
+        if(numPattern.test(val)){
+            searchSelect.enable();
+        }
+    });
+
+    searchSelect.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        if(es){
+            es = disableSearchSelect(es);
+        }
+
+        var type = searchTypeIn.val();
+        var areaType = parseInt(searchAreaTypeIn.val());
+        es = enableSearchSelect(type, areaType);
+    });
+
+    searchSelectOk.click(function() {
+        if($(this).hasClass("disabled")) return false;
+
+        searchSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
+
+        var searchType = searchTypeIn.val();
+        var searchAreaType = parseInt(searchAreaTypeIn.val());
+        var searchArea = spaceZoneToWKT(parseOverLay(searchAreaType, es.getOverLays()), searchType=="near");
+        var searchDist;
+
+        if(searchType=="near"){
+            searchDist = es.getOverLays()["circle"].radius;
+        }
+
+        getData("php/get.php", function(ret){
+            setData(ret);
+            refreshList();
+        }, function(err){
+            log(err);
+        }, {
+            limit : searchType,
+            area : searchArea,
+            dist : searchDist
+        });
+
+        initSearch();
+    });
+
     
 });

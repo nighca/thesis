@@ -1,6 +1,6 @@
 var spaceZoneTypes = ["Null", "point", "polyline", "polygon"];
 
-var defaultRadius = 100;
+var defaultRadius = 500;
 
 var datasetId = "timeSpaceObjs";
 
