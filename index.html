@@ -32,20 +32,32 @@
       <div id="timelinecontainer" class="timeline-container">
 
         <ul class="ops timeline-ops">
-          <li id="timeline-in" class="op" ntitle="zoom in">
+          <li class="words" ntitle="">
+            时间
+          </li>
+          <li class="seperator"></li>
+          <li id="timeline-in" class="op" ntitle="放大">
             <i class="icon-zoom-in"></i>
           </li>
-          <li id="timeline-out" class="op" ntitle="zoom out">
+          <li id="timeline-out" class="op" ntitle="缩小">
             <i class="icon-zoom-out"></i>
           </li>
+          <li class="seperator"></li>
           <form id="time-vals-in" class="vals-in">
-            <li id="timeline-select" class="op disabled" ntitle="select a period on timeline">
+            <li id="timeline-select" class="op disabled" ntitle="在时间轴上选择一个时间段">
               <i class="icon-edit"></i>
             </li>
-            <li id="timeline-select-ok" class="op disabled" ntitle="use the selected zone">
+            <input name="start" type="text" class="val-in click-choose align_center" placeholder="点击选择起始时间点" ntitle="留空表示负无穷" disabled="disabled" />
+            <li class="words"> - </li>
+            <input name="end" type="text" class="val-in click-choose align_center" placeholder="点击选择结束时间点" ntitle="留空表示正无穷" disabled="disabled" />
+            <li id="timeline-select-ok" class="op disabled" ntitle="添加已选择时间信息">
               <i class="icon-ok"></i>
             </li>
+            <li class="seperator"></li>
           </form>
+          <li id="guide" class="words" ntitle="">
+            点击<i class="icon-pencil"></i>添加时空属性
+          </li>
         </ul>
 
         <div id="timeline" class="timeline"></div>
@@ -54,30 +66,39 @@
       <div id="mapcontainer" class="map-container">
 
         <ul class="ops map-ops">
-          <li id="create-obj" class="op" ntitle="create a TimeSpace Object">
+          <li class="words" ntitle="">
+            空间
+          </li>
+          <li class="seperator"></li>
+          <li id="create-obj" class="op" ntitle="添加对象时间-空间属性">
             <i class="icon-pencil"></i>
           </li>
           <form id="space-vals-in" class="vals-in">
-            <input name="name" type="text" class="val-in" placeholder="Name" />
+            <input name="name" type="text" class="val-in" placeholder="Id，对象(node)的ID" />
             <select name="type" id="" class="val-in" disabled="disabled">
-              <option value="0">Type</option>
-              <option value="1">Point</option>
-              <option value="2">Polyline</option>
-              <option value="3">Polygon</option>
+              <option value="0">空间区域类型选择</option>
+              <option value="1">点</option>
+              <option value="2">折线</option>
+              <option value="3">多边形</option>
             </select>
-            <li id="map-select" class="op disabled" ntitle="select a zone on map">
+            <li id="map-select" class="op disabled" ntitle="在地图上选取一个区域">
               <i class="icon-edit"></i>
             </li>
-            <li id="map-select-ok" class="op disabled" ntitle="use the selected zone">
+            <li id="map-select-ok" class="op disabled" ntitle="将已选择区域添加到当前选择的时间段中">
               <i class="icon-ok"></i>
             </li>
-            <li id="obj-create-ok" class="op disabled" ntitle="save the obj">
+            <li class="seperator"></li>
+            <li id="obj-create-ok" class="op disabled" ntitle="保存对象的时间空间属性">
               <i class="icon-save"></i>
             </li>
           </form>
         </ul>
 
         <ul class="ops search-ops">
+          <li class="words" ntitle="">
+            筛选
+          </li>
+          <li class="seperator"></li>
           <li id="show-all" class="op" ntitle="显示所有对象">
             <i class="icon-refresh"></i>
           </li>
@@ -91,7 +112,7 @@
               <option value="near">附近</option>
             </select>
             <select name="areatype" id="" class="val-in" disabled="disabled">
-              <option value="0">位置</option>
+              <option value="0">参照区域类型选择</option>
               <option value="1">点</option>
               <option value="2">折线</option>
               <option value="3">多边形</option>
@@ -156,14 +177,14 @@
     </script>
     <script id="obj-template" type="text/html">
     <li class="obj">
-      <div class="head"><%=name%></div>
+      <div class="head">
+        <%=name%>
+        <i class="icon-remove remove-item"></i>
+      </div>
       <div class="body">
         <ul class="infos">
           <li class="info"><strong>ID: </strong><span name="id" class="name val"><%=id%></span></li>
-          <li class="info">
-            <h4 class="ttl">space-zones (<%=spaceZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
-            <% include("info-template", {info: spaceZone.zones}) %>
-          </li>
+          
           <li class="info">
             <h4 class="ttl">time-zones (<%=timeZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
             <% include("info-template", {info: timeZone.zones}) %>

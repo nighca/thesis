@@ -71,11 +71,11 @@ var setData = function(items){
             objList.push(obj);
         }
 
-        obj.addTimeZone({
+        var timeZone = obj.addTimeZone({
             start: parseInt(item.begin)*1000,
             end: parseInt(item.end)*1000
         });
-        obj.addSpaceZone(parseSpace(JSON.parse(item.space)));
+        timeZone.spaceZone.add(parseSpace(JSON.parse(item.space)));
     };
 };
 
@@ -129,30 +129,29 @@ TimeSpaceObj.prototype.save = function(callback, fail) {
     var objId = this.id;
 
     var timeZones = this.timeZone.zones;
-    var spaceZones = this.spaceZone.zones;
 
     for (var i = timeZones.length - 1; i >= 0; i--) {
     	var timeZone = timeZones[i];
     	var begin = timeFormat(timeZone.start);
     	var end = timeFormat(timeZone.end);
+        var spaceZones = timeZone.spaceZone.zones;
+
     	for (var j = spaceZones.length - 1; j >= 0; j--) {
     		var spaceZone = spaceZones[j];
     		var space = spaceZoneToWKT(spaceZone);
     		var type = spaceZoneTypes[spaceZone.type];
 
     		postData({
-		    	"action": "insertTimeSpace",
+		    	"action": "insert",
 		    	"objId": objId,
 		    	"begin": begin,
 		    	"end": end,
-		    	"description": "haha, test",
+		    	"description": "Input by time_space v2.",
 		    	"type": type,
 		    	"space": space
 		    }, "php/op.php", function(res){
-		    	log(res);
                 callback && callback();
 		    }, function(err){
-		    	log(err);
                 fail && fail();
 		    });
     	};
@@ -166,8 +165,15 @@ TimeSpaceObj.prototype.load = function(name) {
     return this;
 };
 
-TimeSpaceObj.prototype.delete = function() {
-    removeFromLocal(this.name, "TimeSpaceObj");
-    this = null;
+TimeSpaceObj.prototype.delete = function(callback, fail) {
+    postData({
+        "action":"delete",
+        "objId":this.id
+    },"php/op.php", function(res){
+        callback && callback();
+    }, function(err){
+        fail && fail();
+    });
+    
     return this;
 };

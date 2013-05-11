@@ -3,11 +3,12 @@ require_once('../../php/db.class.php');			          //引入info.class.php
 
 @$action = $_POST['action'];				              //获取提交的action值
 switch($action){
-	case 'insertTimeSpace'			: insertTimeSpace(); break;
+	case 'insert'					: insert(); break;
+	case 'delete'					: delete(); break;
     default 						: echo 'null'; break;
 }
 
-function insertTimeSpace(){
+function insert(){
 	@$idarti = $_POST['objId'];
 	@$begin = $_POST['begin'];
 	@$end = $_POST['end'];
@@ -30,5 +31,29 @@ function insertTimeSpace(){
 	));	
 }
 
+function delete(){
+	@$idarti = $_POST['objId'];
+
+	$db = new DB();
+	$db->open();
+
+	$sql = "select idgeo from timea where idarti = $idarti;";
+	@$geoIDs = $db->getObjListBySql($sql);
+
+	$db = new DB();
+	$db->open();
+    
+    pg_query($db->conn, "delete from timea where idarti = $idarti;");
+   
+    foreach ($geoIDs as $geoID) {
+    	@$idgeo = $geoID->idgeo;
+    	pg_query($db->conn, "delete from point where idgeo = '$idgeo';");
+    	pg_query($db->conn, "delete from polyline where idgeo = '$idgeo';");
+    	pg_query($db->conn, "delete from polygon where idgeo = '$idgeo';");
+    	pg_query($db->conn, "delete from geo where idgeo = '$idgeo';");
+    }
+
+    echo "null";
+}
 
 ?>

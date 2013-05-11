@@ -24,6 +24,42 @@ var zoomOut = function(timeline, bandIndex){
 	return zoom(timeline, bandIndex, false);
 };
 
+function enableTimeSelect(timeline, afterSelect){
+    log("Time point select");//--------------------
+
+    var time;
+    var listeners = [];
+
+    var band = tm.timeline._bands[0];
+    var bandDIV = $(band._div);
+
+    var getTime = function(event) {
+        var A = SimileAjax.DOM.getEventRelativeCoordinates(event, this);
+        time = band._ether.pixelOffsetToDate(A.x + band._viewOffset).valueOf();
+        afterSelect && afterSelect(time);
+    };
+
+    bandDIV.on("click", getTime);
+    listeners.push({
+        obj: bandDIV,
+        event: "click",
+        handler: getTime
+    });
+
+    return {
+        getTime: function(){
+            return time;
+        },
+        clean: function(){
+            $.each(listeners, function(i, listener){
+                listener["obj"].off(listener.event, listener.handler);
+            });
+            return true;
+        }
+    };
+};
+
+
 function enablePeriodSelect(timeline, afterSelect){
   	log("Period select");//--------------------
 	var period = {};
@@ -120,7 +156,7 @@ function enablePeriodSelect(timeline, afterSelect){
 				listener["obj"].off(listener.event, listener.handler);
 			});
 
-	    	rectangle.remove();
+	    	rectangle && rectangle.remove();
             log($(".time-period-rec"));//----------------------
             $(".time-period-rec").remove();
 	    	while(dates.pop()>1);
@@ -156,7 +192,7 @@ function showTimeZone(timeline, zone, afterShow){
             return rectangle;
         },
         clean: function(){
-            rectangle.remove();
+            rectangle && rectangle.remove();
         }
     };
 }
@@ -180,7 +216,7 @@ function showTimeZones(timeline, zones, afterShow){
         },
         clean: function(){
             $.each(rectangles, function(i, rectangle){
-                rectangle.remove();
+                rectangle && rectangle.remove();
             });
         }
     };

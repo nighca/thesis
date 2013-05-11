@@ -124,6 +124,13 @@ var removeFromLocal = function (key, nameSpace) {
 	return localStorage.removeItem(key);
 };
 
+var highlight = function(){
+	$(".highlight").removeClass("highlight");
+	for (var i = 0, l = arguments.length; i < l; i++) {
+		arguments[i].addClass("highlight");
+	};
+};
+
 template.helper('stringify', function (content) {
 	return JSON.stringify(content);
 });
@@ -135,6 +142,18 @@ template.helper('getSpaceType', function(type){
 template.helper('isArray', isArray);
 
 jQuery.fn.extend({
+	highlight: function(b){
+		if(b===false){
+			$(this).removeClass("highlight");
+		}else{
+			$(this).addClass("highlight");
+		}
+		return $(this);
+	},
+	dishighlight: function(){
+		$(this).removeClass("highlight");
+		return $(this);
+	},
 	setable: function (val) {
 		val = val ? true : false;
 		var withDisableAttrEles = ["SELECT","INPUT"]; 
@@ -145,6 +164,7 @@ jQuery.fn.extend({
 				if(val) $(this).removeClass("disabled");
 				else $(this).addClass("disabled");
 			}
+			$(this).highlight(val);
 		});
 		return $(this);
 	},

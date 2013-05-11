@@ -5,23 +5,6 @@ var Point = function (latitude, longitude) {
     return this;
 };
 
-var TimeZone = function() {
-    this.zones = [];
-    if(arguments.length == 1 && isArray(arguments[0])){
-        this.zones = arguments[0];
-    }else{
-        for(var i in arguments){
-            this.zones.push(arguments[i]);
-        }
-    }
-};
-
-TimeZone.prototype.add = function(){
-    for(var i in arguments){
-        this.zones.push(arguments[i]);
-    }
-};
-
 var SpaceZone = function() {
     this.zones = [];
     if(arguments.length == 1 && isArray(arguments[0])){
@@ -49,11 +32,33 @@ SpaceZone.prototype.getPos = function(){
     }
 };
 
+var TimeZone = function() {
+    this.zones = [];
+    if(arguments.length == 1 && isArray(arguments[0])){
+        this.zones = arguments[0];
+    }else{
+        for(var i in arguments){
+            this.zones.push(arguments[i]);
+        }
+    }
+};
+
+TimeZone.prototype.add = function(zone){
+    var zones = this.zones;
+    for(var j in zones){
+        if(zones[j].start == zone.start && zones[j].end == zone.end){
+            return zones[j];
+        }
+    }
+    zones.push(zone);
+    if(!zone.spaceZone) zone.spaceZone = new SpaceZone();
+    return zone;
+};
+
 var TimeSpaceObj = function () {
     this.name = "";
     this.id = "";
     this.timeZone = new TimeZone();
-    this.spaceZone = new SpaceZone();
     this.tags = [];
 };
 
@@ -67,11 +72,7 @@ TimeSpaceObj.prototype.init = function(obj) {
 };
 
 TimeSpaceObj.prototype.addTimeZone = function() {
-    this.timeZone.add.apply(this.timeZone, arguments);
-};
-
-TimeSpaceObj.prototype.addSpaceZone = function() {
-    this.spaceZone.add.apply(this.spaceZone, arguments);
+    return this.timeZone.add.apply(this.timeZone, arguments);
 };
 
 TimeSpaceObj.prototype.save = function() {
@@ -88,11 +89,6 @@ TimeSpaceObj.prototype.delete = function() {
     removeFromLocal(this.name, "TimeSpaceObj");
     this = null;
     return this;
-};
-
-TimeSpaceObj.prototype.getPos = function() {
-    if(!this.spaceZone) return null;
-    return this.spaceZone.getPos();
 };
 
 var parseOverLay = function(type, overLays){
@@ -152,7 +148,7 @@ TimeMap.prototype.showObjs = function(objs){
                 title: obj.name
             };
             certainDate = (timeZone.start + timeZone.end)/2;
-            var pos = obj.getPos();
+            var pos = timeZone.spaceZone.getPos();
 
             if(pos){
                 item["point"] = {

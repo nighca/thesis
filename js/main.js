@@ -116,39 +116,6 @@ $(function() {
  */
 
  $(function(){
-    var maper, timeliner;
-    rightList = $("#objs").checkList(".head", ".body", null, function(obj){
-        obj.find(".cnt").hide(200);
-        obj.find(".more-mark").show();
-        obj.find(".no-more-mark").hide();
-
-        var id = obj.find("[name=id]").text();
-
-        var chosenObj;
-        for (var i = objList.length - 1; i >= 0; i--) {
-            if(objList[i].id == id){
-                chosenObj = objList[i];
-                break;
-            }
-        };
-
-        maper && maper.clean && maper.clean();
-        timeliner && timeliner.clean && timeliner.clean();
-        maper = showTimeZones(tm.timeline, chosenObj.timeZone.zones, function(){});
-        timeliner = showSpaceZones(map, chosenObj.spaceZone.zones, function(){});
-    });
-    $("#objs").delegate(".ttl", "click", function(){
-        $(this).next(".cnt").slideToggle(200);
-        $(this).find(".more-mark").toggle();
-        $(this).find(".no-more-mark").toggle();
-    });
-    $("#objs").delegate("li", "mouseenter", function(){
-        $(this).addClass("current");
-    });
-    $("#objs").delegate("li", "mouseleave", function(){
-        $(this).removeClass("current");
-    });
-
     var refreshList = function(list){
         if(list) objList = list;
         tm.showObjs(objList);
@@ -165,6 +132,55 @@ $(function() {
         });
     };
 
+    var maper, timeliner;
+    rightList = $("#objs").checkList(".head", ".body", null, function(obj){
+        obj.find(".cnt").hide(200);
+        obj.find(".more-mark").show();
+        obj.find(".no-more-mark").hide();
+
+        var id = obj.find("[name=id]").text();
+
+        var chosenObj;
+        for (var i = objList.length - 1; i >= 0; i--) {
+            if(objList[i].id == id){
+                chosenObj = objList[i];
+                break;
+            }
+        };
+
+        timeliner && timeliner.clean && timeliner.clean();
+        maper && maper.clean && maper.clean();
+        //timeliner = showTimeZones(tm.timeline, chosenObj.timeZone.zones, function(){});
+        maper = showSpaceZones(map, chosenObj.timeZone.zones[0].spaceZone.zones, function(){});
+    });
+    $("#objs").delegate(".ttl", "click", function(){
+        $(this).next(".cnt").slideToggle(200);
+        $(this).find(".more-mark").toggle();
+        $(this).find(".no-more-mark").toggle();
+    });
+    $("#objs").delegate("li", "mouseenter", function(){
+        $(this).addClass("current");
+    });
+    $("#objs").delegate("li", "mouseleave", function(){
+        $(this).removeClass("current");
+    });
+    $("#objs").delegate(".remove-item", "click", function(e){
+        var id = $(this).parents(".obj").find("[name=id]").text();
+        var i, obj;
+        for (i = objList.length - 1; i >= 0; i--) {
+            if(objList[i].id == id){
+                obj = objList[i];
+                break;
+            }
+        };
+        obj && obj.delete(function(){
+            refreshFromRemote();
+        }, function(){
+            refreshFromRemote();
+        });
+        return false;
+    });
+
     refreshList();
 
     //show title
@@ -178,6 +194,8 @@ $(function() {
     var createObj = $("#create-obj");
     var mapSelect = $("#map-select");
     var timelineSelect = $("#timeline-select");
+    var timelineStart = timeForm.find("[name=start]");
+    var timelineEnd = timeForm.find("[name=end]");
     var mapSelectOk = $("#map-select-ok");
     var timelineSelectOk = $("#timeline-select-ok");
     var createOk = $("#obj-create-ok");
@@ -191,9 +209,15 @@ $(function() {
     var searchSelect = $("#search-select");
     var searchSelectOk = $("#search-select-ok");
 
+    var guide = $("#guide");
 
     var currentObj = new TimeSpaceObj();
+    var currentTimeZone = {};
     //currentObj = new TimeSpaceObj();//----------------------
+    
+    var showGuide = function(word){
+        guide.html(word);
+    };
 
     var enableSpaceSelect = function(type){
         var e;
@@ -249,7 +273,9 @@ $(function() {
                 break;
             case 3:
                 if(type=="within"){
-                    e = enablePolygonSelect(map, afterSelect);
+                    e = enablePolygonSelect(map, function(){
+                        searchSelectOk.enable();
+                    });
                 }else{
                     e = enablePolygonSelectWithRadius(map, afterSelect);
                 }
@@ -270,6 +296,8 @@ $(function() {
         timelineSelectOk.disable();
         mapSelectOk.disable();
         timelineSelect.disable();
+        timelineStart.val("").disable();
+        timelineEnd.val("").disable();
         mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
         typeIn.disable().val(0);
         nameIn.val("");
@@ -281,6 +309,8 @@ $(function() {
 
         e = disableSpaceSelect(e);
         et = disablePeriodSelect(et);
+
+        showGuide('点击<i class="icon-pencil"></i>添加时空属性');
     };
 
     var initSearch = function(){
@@ -335,6 +365,7 @@ $(function() {
         init();
         if(i.hasClass("icon-pencil")){
             i.removeClass("icon-pencil").addClass("icon-remove");
+            showGuide("输入对象的ID(即node)的ID");
         }else{
             i.removeClass("icon-remove").addClass("icon-pencil");
         }
@@ -343,23 +374,52 @@ $(function() {
     nameIn.keyup(function(){
         var hasName = $(this).val();
         timelineSelect.setable(hasName);
+        showGuide('点击时间<i class="icon-edit"></i>以选取时间段');
     });
 
     timelineSelect.click(function(){
-        if(et){
+        /*if(et){
             et = disablePeriodSelect(et);
         }
         et = enablePeriodSelect(tm.timeline, function(){
+            currentObj.addTimeZone(currentTimeZone);
             typeIn.enable();
+        });*/
+        timelineStart.enable();
+        timelineEnd.enable();
+        typeIn.enable();
+        currentObj.addTimeZone(currentTimeZone);
+    });
+
+    timelineStart.click(function(){
+        if(et){
+            et = disablePeriodSelect(et);
+        }
+        et = enableTimeSelect(tm.timeline, function(time){
+            currentTimeZone.start = time;
+            timelineStart.val(timeFormat(time));
+        });
+    });
+
+    timelineEnd.click(function(){
+        if(et){
+            et = disablePeriodSelect(et);
+        }
+        et = enableTimeSelect(tm.timeline, function(time){
+            currentTimeZone.end = time;
+            timelineEnd.val(timeFormat(time));
         });
     });
 
     timelineSelectOk.click(function() {
         if($(this).hasClass("disabled")) return false;
 
-        var timeZone = parsePeriod(et.getPeriod());
+        /*var period = parsePeriod(et.getPeriod());
+        currentTimeZone.start = period.start;
+        currentTimeZone.end = period.end;*/
 
-        currentObj.addTimeZone(timeZone);
+        log(currentTimeZone);//----------------------
+        currentTimeZone = {};
         createOk.enable();
     });
 
@@ -389,8 +449,8 @@ $(function() {
         var type = parseInt(typeIn.val());
         var spaceZone = parseOverLay(type, e.getOverLays());
 
-        currentObj.addSpaceZone(spaceZone);
-        log(spaceZone, currentObj.spaceZone);//-------------------
+        currentTimeZone.spaceZone.add(spaceZone);
+        log(spaceZone, currentTimeZone);//-------------------
         timelineSelectOk.enable();
     });
 
@@ -405,7 +465,7 @@ $(function() {
             refreshFromRemote();
         });
 
-        log(currentObj.spaceZone);//------------------
+        log(currentObj.timeZone);//------------------
 
         init();
     });
