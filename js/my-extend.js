@@ -75,6 +75,15 @@ var timeFormat = function(t){
 	return dateFormat(d, "-");
 };
 
+var today = function(){
+	var d = new Date(Date.now());
+    d.setMilliseconds(0);
+    d.setSeconds(0);
+    d.setMinutes(0);
+    d.setHours(0);
+    return d;
+};
+
 var saveToLocal = function (key, value, nameSpace) {
 	if(typeof key !== "string") return false;
 	if(nameSpace) key = nameSpace + "$" + key;

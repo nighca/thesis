@@ -46,6 +46,18 @@ function enableTimeSelect(timeline, afterSelect){
         handler: getTime
     });
 
+    var showTime = function(event){
+        var A = SimileAjax.DOM.getEventRelativeCoordinates(event, this);
+        time = band._ether.pixelOffsetToDate(A.x + band._viewOffset).valueOf();
+        $("#guide").text(timeFormat(time));
+    };
+    bandDIV.on("mousemove", showTime);
+    listeners.push({
+        obj: bandDIV,
+        event: "mousemove",
+        handler: showTime
+    });
+
     return {
         getTime: function(){
             return time;

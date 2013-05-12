@@ -165,6 +165,7 @@ $(function() {
         $(this).removeClass("current");
     });
     $("#objs").delegate(".remove-item", "click", function(e){
+        if(!confirm("确定删除？")) return false;
         var id = $(this).parents(".obj").find("[name=id]").text();
         var i, obj;
         for (i = objList.length - 1; i >= 0; i--) {
@@ -219,26 +220,24 @@ $(function() {
         guide.html(word);
     };
 
-    var enableSpaceSelect = function(type){
+    var enableSpaceSelect = function(type, afterSelect){
         var e;
+        var after = function(){
+            mapSelectOk.enable();
+            afterSelect();
+        };
         switch(type){
             case 0:
                 return null;
                 break;
             case 1:
-                e = enablePointSelect(map, function(){
-                    mapSelectOk.enable();
-                });
+                e = enablePointSelect(map, after);
                 break;
             case 2:
-                e = enableLineSelect(map, function(){
-                    mapSelectOk.enable();
-                });
+                e = enableLineSelect(map, after);
                 break;
             case 3:
-                e = enablePolygonSelect(map, function(){
-                    mapSelectOk.enable();
-                });
+                e = enablePolygonSelect(map, after);
                 break;
             default:
                 return null;
@@ -297,7 +296,9 @@ $(function() {
         mapSelectOk.disable();
         timelineSelect.disable();
         timelineStart.val("").disable();
+        timelineStart.children("[value=timeline]").text("从时间轴上点选");
         timelineEnd.val("").disable();
+        timelineEnd.children("[value=timeline]").text("从时间轴上点选");
         mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
         typeIn.disable().val(0);
         nameIn.val("");
@@ -311,6 +312,24 @@ $(function() {
         et = disablePeriodSelect(et);
 
         showGuide('点击<i class="icon-pencil"></i>添加时空属性');
+    };
+
+    var initSelect = function(){
+        timelineSelectOk.disable();
+        mapSelectOk.disable();
+        timelineSelect.disable();
+        timelineStart.val("");
+        timelineStart.children("[value=timeline]").text("从时间轴上点选");
+        timelineEnd.val("");
+        timelineEnd.children("[value=timeline]").text("从时间轴上点选");
+        mapSelect.disable().find("i").removeClass("icon-trash").addClass("icon-edit");
+        typeIn.val(0);
+
+        maper && maper.clean && maper.clean();
+        timeliner && timeliner.clean && timeliner.clean();
+
+        e = disableSpaceSelect(e);
+        et = disablePeriodSelect(et);
     };
 
     var initSearch = function(){
@@ -358,6 +377,10 @@ $(function() {
         clearTimeout(recorder);
     });
 
+    $(".ops").find("*").click(function(){
+        $(this).dishighlight();
+    });
+
     createObj.click(function(){
         var i = $(this).find("i");
         spaceForm.toggle();
@@ -366,15 +389,22 @@ $(function() {
         if(i.hasClass("icon-pencil")){
             i.removeClass("icon-pencil").addClass("icon-remove");
             showGuide("输入对象的ID(即node)的ID");
+            nameIn.enable();
         }else{
             i.removeClass("icon-remove").addClass("icon-pencil");
         }
-    });
+    }).highlight();
 
     nameIn.keyup(function(){
         var hasName = $(this).val();
         timelineSelect.setable(hasName);
-        showGuide('点击时间<i class="icon-edit"></i>以选取时间段');
+        if(hasName){
+            timelineStart.enable();
+            timelineEnd.enable();
+            typeIn.enable();
+            currentObj.addTimeZone(currentTimeZone);
+        }
+        showGuide('在左边选择时段的始末时间，要添加空间信息，在下方选择空间内容类型');
     });
 
     timelineSelect.click(function(){
@@ -391,43 +421,98 @@ $(function() {
         currentObj.addTimeZone(currentTimeZone);
     });
 
-    timelineStart.click(function(){
+    var triggerChange = function(){
+        if($(this).val() == "timeline"){
+            $(this).trigger("change");
+        }
+    };
+    timelineStart.click(triggerChange);
+    timelineStart.click(triggerChange);
+
+    timelineStart.change(function(){
         if(et){
             et = disablePeriodSelect(et);
         }
-        et = enableTimeSelect(tm.timeline, function(time){
-            currentTimeZone.start = time;
-            timelineStart.val(timeFormat(time));
-        });
+        if($(this).val() == "timeline"){
+            et = enableTimeSelect(tm.timeline, function(time){
+                if(!currentTimeZone.spaceZone) currentObj.addTimeZone(currentTimeZone);
+                currentTimeZone.start = time;
+                timelineStart.children("[value=timeline]").text(timeFormat(time)+"(点选)");
+            });
+            showGuide('在时间轴上点击以选择时间点');
+        }
+        if($(this).val() == "today"){
+            showGuide(timeFormat(today().valueOf()));
+        }
     });
 
-    timelineEnd.click(function(){
+    timelineEnd.change(function(){
         if(et){
             et = disablePeriodSelect(et);
         }
-        et = enableTimeSelect(tm.timeline, function(time){
-            currentTimeZone.end = time;
-            timelineEnd.val(timeFormat(time));
-        });
+        if($(this).val() == "timeline"){
+            et = enableTimeSelect(tm.timeline, function(time){
+                if(!currentTimeZone.spaceZone) currentObj.addTimeZone(currentTimeZone);
+                currentTimeZone.end = time;
+                timelineEnd.children("[value=timeline]").text(timeFormat(time)+"(点选)");
+            });
+            showGuide('在时间轴上点击以选择时间点');
+        }
+        if($(this).val() == "today"){
+            showGuide(timeFormat(today().valueOf()));
+        }
     });
 
     timelineSelectOk.click(function() {
         if($(this).hasClass("disabled")) return false;
 
-        /*var period = parsePeriod(et.getPeriod());
-        currentTimeZone.start = period.start;
-        currentTimeZone.end = period.end;*/
+        var startType = timelineStart.val();
+        var endType = timelineEnd.val();
+
+        switch(startType){
+            case "": 
+                alert("无法添加，未选择开始时间");
+                timelineStart.highlight();
+                return false;
+            case "timeline": 
+                break;
+            case "today": 
+                currentTimeZone.start = today().valueOf();
+                break;
+            case "infinity": 
+                currentTimeZone.start = -62167334400000;
+                break;
+        }
+        switch(endType){
+            case "": 
+                alert("无法添加，未选择结束时间");
+                timelineEnd.highlight();
+                return false;
+            case "timeline": 
+                break;
+            case "today": 
+                currentTimeZone.end = today().valueOf();
+                break;
+            case "infinity": 
+                currentTimeZone.end = 2000000000000;
+                break;
+        }
 
         log(currentTimeZone);//----------------------
         currentTimeZone = {};
         createOk.enable();
+        initSelect();
+        showGuide('已添加，点击<i class="icon-save"></i>保存对象，也可以继续添加时段信息');
     });
 
     typeIn.change(function(){
         var type = parseInt($(this).val());
 
         e = disableSpaceSelect(e);
-        mapSelect.setable(type!=0).find("i").removeClass("icon-trash").addClass("icon-edit").trigger("click");
+        mapSelect.setable(type!=0);
+        if(type!=0){
+            mapSelect.find("i").removeClass("icon-trash").addClass("icon-edit").trigger("click");
+        }
     });
 
     mapSelect.click(function() {
@@ -438,7 +523,10 @@ $(function() {
         }
 
         var type = parseInt(typeIn.val());
-        e = enableSpaceSelect(type);
+        e = enableSpaceSelect(type, function(){
+            showGuide('点击“空间”中的<i class="icon-ok"></i>将选取好的空间信息加入对象');
+        });
+        showGuide("在地图上选取空间范围");
     });
 
     mapSelectOk.click(function() {
@@ -449,6 +537,7 @@ $(function() {
         var type = parseInt(typeIn.val());
         var spaceZone = parseOverLay(type, e.getOverLays());
 
+        if(!currentTimeZone.spaceZone) currentObj.addTimeZone(currentTimeZone);
         currentTimeZone.spaceZone.add(spaceZone);
         log(spaceZone, currentTimeZone);//-------------------
         timelineSelectOk.enable();
@@ -463,6 +552,7 @@ $(function() {
         currentObj.id = name;
         currentObj.save(function(){
             refreshFromRemote();
+            showGuide('保存完毕');
         });
 
         log(currentObj.timeZone);//------------------

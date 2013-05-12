@@ -42,19 +42,35 @@
           <li id="timeline-out" class="op" ntitle="缩小">
             <i class="icon-zoom-out"></i>
           </li>
-          <li class="seperator"></li>
           <form id="time-vals-in" class="vals-in">
-            <li id="timeline-select" class="op disabled" ntitle="在时间轴上选择一个时间段">
+            <li class="seperator"></li>
+            <!-- <li id="timeline-select" class="op disabled" ntitle="在时间轴上选择一个时间段">
               <i class="icon-edit"></i>
-            </li>
-            <input name="start" type="text" class="val-in click-choose align_center" placeholder="点击选择起始时间点" ntitle="留空表示负无穷" disabled="disabled" />
+            </li> -->
+            <!-- <input name="start" type="text" class="val-in click-choose align_center" placeholder="点击选择起始时间点" ntitle="留空表示负无穷" disabled="disabled" /> -->
+            <select name="start" id="" class="val-in" disabled="disabled">
+              <option value="">选择起始时间点</option>
+              <option value="timeline">从时间轴上点选</option>
+              <option value="today">今天</option>
+              <!-- <option value="infinity">负无穷</option> -->
+            </select>
             <li class="words"> - </li>
-            <input name="end" type="text" class="val-in click-choose align_center" placeholder="点击选择结束时间点" ntitle="留空表示正无穷" disabled="disabled" />
+            <!-- <input name="end" type="text" class="val-in click-choose align_center" placeholder="点击选择结束时间点" ntitle="留空表示正无穷" disabled="disabled" /> -->
+            <select name="end" id="" class="val-in" disabled="disabled">
+              <option value="">选择结束时间点</option>
+              <option value="timeline">从时间轴上点选</option>
+              <option value="today">今天</option>
+              <!-- <option value="infinity">正无穷</option> -->
+            </select>
             <li id="timeline-select-ok" class="op disabled" ntitle="添加已选择时间信息">
               <i class="icon-ok"></i>
             </li>
-            <li class="seperator"></li>
           </form>
+        </ul>
+        <ul class="ops guide-bar">
+          <li class="op">
+            <i class="icon-question-sign"></i>
+          </li>
           <li id="guide" class="words" ntitle="">
             点击<i class="icon-pencil"></i>添加时空属性
           </li>
@@ -74,7 +90,7 @@
             <i class="icon-pencil"></i>
           </li>
           <form id="space-vals-in" class="vals-in">
-            <input name="name" type="text" class="val-in" placeholder="Id，对象(node)的ID" />
+            <input name="name" type="text" class="val-in" placeholder="Id，对象(node)的ID" disabled="disabled" />
             <select name="type" id="" class="val-in" disabled="disabled">
               <option value="0">空间区域类型选择</option>
               <option value="1">点</option>
@@ -179,7 +195,7 @@
     <li class="obj">
       <div class="head">
         <%=name%>
-        <i class="icon-remove remove-item"></i>
+        <i class="icon-remove remove-item" ntitle="删除"></i>
       </div>
       <div class="body">
         <ul class="infos">
