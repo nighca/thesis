@@ -1,0 +1,229 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>N</title>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAi8v6Ahh_ZWnUE517FJYL4bojwnAcl0IA&sensor=false"></script>
+
+    <script type="text/javascript" src="add-on/jquery/jquery-1.9.1.min.js"></script>
+    <!--
+    <script type="text/javascript" src="add-on/timemap.2.0.1/lib/jquery-1.6.2.min.js"></script>
+  -->
+    <script type="text/javascript" src="add-on/template/template.js"></script>
+    <script type="text/javascript" src="add-on/timemap.2.0.1/lib/mxn/mxn.js?(googlev3)"></script>
+
+    <script type="text/javascript" src="add-on/timemap.2.0.1/lib/timeline-2.3.0-debug.js"></script>
+    <!--
+    <script type="text/javascript" src="add-on/timemap.2.0.1/lib/timeline-2.3.0.js"></script>
+  -->
+    <script src="add-on/timemap.2.0.1/src/timemap.js" type="text/javascript"></script>
+    <script src="add-on/timemap.2.0.1/src/manipulation.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/config.js"></script>
+    <script src="js/my-extend.js" type="text/javascript"></script>
+    <script src="js/TimeSpaceObj.js" type="text/javascript"></script>
+    <script src="js/middleware.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+	</head>
+	<body>
+    <div id="title_block" class="title_block" style="display:none;">
+      <div id="title_box" class="title_box">I'm the title box.</div>
+    </div>
+
+		<div id="timemap" class="timemap-container">
+
+      <div id="timelinecontainer" class="timeline-container">
+
+        <ul class="ops timeline-ops">
+          <li class="words" ntitle="">
+            时间
+          </li>
+          <li class="seperator"></li>
+          <li id="timeline-in" class="op" ntitle="放大">
+            <i class="icon-zoom-in"></i>
+          </li>
+          <li id="timeline-out" class="op" ntitle="缩小">
+            <i class="icon-zoom-out"></i>
+          </li>
+          <form id="time-vals-in" class="vals-in">
+            <li class="seperator"></li>
+            <!-- <li id="timeline-select" class="op disabled" ntitle="在时间轴上选择一个时间段">
+              <i class="icon-edit"></i>
+            </li> -->
+            <!-- <input name="start" type="text" class="val-in click-choose align_center" placeholder="点击选择起始时间点" ntitle="留空表示负无穷" disabled="disabled" /> -->
+            <select name="start" id="" class="val-in" disabled="disabled">
+              <option value="">选择起始时间点</option>
+              <option value="timeline">从时间轴上点选</option>
+              <option value="today">今天</option>
+              <!-- <option value="infinity">负无穷</option> -->
+            </select>
+            <li class="words"> - </li>
+            <!-- <input name="end" type="text" class="val-in click-choose align_center" placeholder="点击选择结束时间点" ntitle="留空表示正无穷" disabled="disabled" /> -->
+            <select name="end" id="" class="val-in" disabled="disabled">
+              <option value="">选择结束时间点</option>
+              <option value="timeline">从时间轴上点选</option>
+              <option value="today">今天</option>
+              <!-- <option value="infinity">正无穷</option> -->
+            </select>
+            <li id="timeline-select-ok" class="op disabled" ntitle="添加已选择时间信息">
+              <i class="icon-ok"></i>
+            </li>
+          </form>
+        </ul>
+        <ul class="ops guide-bar">
+          <li class="op">
+            <i class="icon-question-sign"></i>
+          </li>
+          <li id="guide" class="words" ntitle="">
+            点击<i class="icon-pencil"></i>添加时空属性
+          </li>
+        </ul>
+
+        <div id="timeline" class="timeline"></div>
+      </div>
+
+      <div id="mapcontainer" class="map-container">
+
+        <ul class="ops map-ops">
+          <li class="words" ntitle="">
+            空间
+          </li>
+          <li class="seperator"></li>
+          <li id="create-obj" class="op" ntitle="添加对象时间-空间属性">
+            <i class="icon-pencil"></i>
+          </li>
+          <form id="space-vals-in" class="vals-in">
+            <input id="name-in" name="name" type="text" class="val-in" placeholder="Id，对象(node)的ID" disabled="disabled" />
+            <select name="type" id="" class="val-in" disabled="disabled">
+              <option value="0">空间区域类型选择</option>
+              <option value="1">点</option>
+              <option value="2">折线</option>
+              <option value="3">多边形</option>
+              <option value="4">搜索</option>
+            </select>
+            <li id="map-select" class="op disabled" ntitle="在地图上选取一个区域">
+              <i class="icon-edit"></i>
+            </li>
+            <input id="keyword-in" name="keyword" type="text" class="val-in" placeholder="搜索关键字" disabled="disabled" />
+            <li id="map-select-ok" class="op disabled" ntitle="将已选择区域添加到当前选择的时间段中">
+              <i class="icon-ok"></i>
+            </li>
+            <li class="seperator"></li>
+            <li id="obj-create-ok" class="op disabled" ntitle="保存对象的时间空间属性">
+              <i class="icon-save"></i>
+            </li>
+          </form>
+        </ul>
+
+        <ul class="ops search-ops">
+          <li class="words" ntitle="">
+            筛选
+          </li>
+          <li class="seperator"></li>
+          <li id="show-all" class="op" ntitle="显示所有对象">
+            <i class="icon-refresh"></i>
+          </li>
+          <li id="search-objs" class="op" ntitle="按条件查找对象">
+            <i class="icon-search"></i>
+          </li>
+          <form id="search-vals-in" class="vals-in">
+            <select name="type" id="search-type-in" class="val-in">
+              <option value="0">搜索条件</option>
+              <option value="within">包含在</option>
+              <option value="near">附近</option>
+            </select>
+            <select name="areatype" id="" class="val-in" disabled="disabled">
+              <option value="0">参照区域类型选择</option>
+              <option value="1">点</option>
+              <option value="2">折线</option>
+              <option value="3">多边形</option>
+            </select>
+            <input name="dist" type="text" class="val-in" placeholder="距离(m)" disabled="disabled" />
+            <li id="search-select" class="op disabled" ntitle="select a zone on map">
+              <i class="icon-edit"></i>
+            </li>
+            <li id="search-select-ok" class="op disabled" ntitle="use the selected zone">
+              <i class="icon-ok"></i>
+            </li>
+          </form>
+        </ul>
+
+        <div id="map" class="map"></div>
+      </div>
+    
+    </div>
+    
+    <script id="info-template" type="text/html">
+      <% if (typeof info === "string" || typeof info === "number") { %>
+      <p class="cnt val"><%=info%></p>
+      <% } else if (isArray(info)) {%>
+        <% if (info.length > 0) { %>
+          <ul class="cnt">
+          <% for (var i=0;i<info.length;i++) { %>
+            <li class="array-list-<%=i+1%>">
+            <h4 class="ttl">
+              <%=i+1%>
+              <% if (isArray(info[i])) { %>
+                (<%=info[i].length%>)
+              <% } %>
+              <span class="more-mark">+</span><span class="no-more-mark">-</span>
+            </h4>
+            <% include("info-template", {info: info[i]}) %>
+            </li>
+          <% } %>
+          </ul>
+        <% } else { %>
+          <p class="cnt val">None</p>
+        <% } %>
+      <% } else if (typeof info === "object") {%>
+        <ul class="cnt">
+        <% for (var key in info) { %>
+          <li>
+          <h4 class="ttl">
+            <%=key%>
+            <% if (isArray(info[key])) { %>
+              (<%=info[key].length%>)
+            <% } %>
+            <span class="more-mark">+</span><span class="no-more-mark">-</span>
+          </h4>
+          <% if (key == "type") { %>
+            <% include("info-template", {info: getSpaceType(info[key])}) %>
+            <% }else{ %>
+            <% include("info-template", {info: info[key]}) %>
+            <% } %>
+          <% } %>
+          </li>
+        </ul>
+      <% } %>
+    </script>
+    <script id="obj-template" type="text/html">
+    <li class="obj">
+      <div class="head">
+        <%=name%>
+        <i class="icon-remove remove-item" ntitle="删除"></i>
+      </div>
+      <div class="body">
+        <ul class="infos">
+          <li class="info"><strong>ID: </strong><span name="id" class="name val"><%=id%></span></li>
+          
+          <li class="info">
+            <h4 class="ttl">time-zones (<%=timeZone.zones.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+            <% include("info-template", {info: timeZone.zones}) %>
+          </li>
+          <li class="info">
+            <h4 class="ttl">tags (<%=tags.length%>) <span class="more-mark">+</span><span class="no-more-mark">-</span></h4>
+            <% include("info-template", {info: tags}) %>
+          </li>
+        </ul>
+      </div>
+    </li>        
+    </script>
+    <div class="side-container">
+      <ul id="objs" class="objs">
+      </ul>
+    </div>
+    
+	</body>
+  <script type="text/javascript" src="js/pre-setting.js"></script>
+  <script type="text/javascript" src="js/timeline-op.js"></script>
+  <script type="text/javascript" src="js/map-op.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+</html>
