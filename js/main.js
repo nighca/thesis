@@ -18,7 +18,6 @@ $(function() {
         featureType: "road",
         elementType: "all",
         stylers: [{
-            //visibility: "off"
         }]
     }], {
         name: "simple"
@@ -197,6 +196,7 @@ $(function() {
 
     var createObj = $("#create-obj");
     var keywordIn = spaceForm.find("[name=keyword]");
+
     var mapSelect = $("#map-select");
     var timelineSelect = $("#timeline-select");
     var timelineStart = timeForm.find("[name=start]");
