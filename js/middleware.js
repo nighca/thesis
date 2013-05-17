@@ -10,6 +10,24 @@ var dataset = {
     }
 };
 
+var getPeriods = function(callback, fail){
+    getData("php/get.php?limit=period", function(ret){
+        if(ret){
+            for (var i = ret.length - 1; i >= 0; i--) {
+                ret[i].start = ret[i].begin;
+            };
+        }
+        callback(ret);
+    }, fail);
+};
+
+var savePeriod = function(data, callback, fail){
+    data.action = "create_period";
+    data.begin = timeFormat(data.start);
+    data.end = timeFormat(data.end);
+    postData(data, "php/op.php", callback, fail);
+};
+
 var parseSpace = function(space){
     var types = {
         "Point" : 1,

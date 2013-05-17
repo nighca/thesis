@@ -201,6 +201,8 @@ $(function() {
     var timelineSelect = $("#timeline-select");
     var timelineStart = timeForm.find("[name=start]");
     var timelineEnd = timeForm.find("[name=end]");
+    var periodCh = $("#period");
+    var periodSave = $("#period-save");
     var mapSelectOk = $("#map-select-ok");
     var timelineSelectOk = $("#timeline-select-ok");
     var createOk = $("#obj-create-ok");
@@ -218,17 +220,29 @@ $(function() {
 
     var currentObj = new TimeSpaceObj();
     var currentTimeZone = {};
-    //currentObj = new TimeSpaceObj();//----------------------
+
+    var periods = [];
     
     var showGuide = function(word){
         guide.html(word);
     };
 
-    var getPeriods = function(){
-        getData("php/get.php?limit=period", function(ret){
-            
+    window.refreshPeriods = function(){
+        getPeriods(function(ret){
+            periods = ret || [];
+            log(periods);//------------------
+            periodCh.children(".add-on").remove();
+            if(periods.length > 0){
+                for (var i = 0, l = periods.length; i < l; i++) {
+                    var period = periods[i];
+                    periodCh.append('<option class="add-on" value="'+i+'" title="'+period.description+'">'+period.id+'</option>');
+                };
+            }else{
+                periodCh.children().eq(0).text('无已定义时间段');
+            }
         }, function(err){});
     };
+    refreshPeriods();
 
     var enableSpaceSelect = function(type, afterSelect){
         var e;
@@ -302,6 +316,7 @@ $(function() {
 
     var init = function(){
 	    initSelect();
+        periodCh.disable();
         timelineStart.disable();
         timelineEnd.disable();
         typeIn.disable();
@@ -317,6 +332,7 @@ $(function() {
         timelineSelectOk.disable();
         mapSelectOk.disable();
         timelineSelect.disable();
+        periodCh.val("");
         timelineStart.val("");
         timelineStart.children("[value=timeline]").text("从时间轴上点选");
         timelineEnd.val("");
@@ -406,6 +422,7 @@ $(function() {
         var hasName = $(this).val();
         timelineSelect.setable(hasName);
         if(hasName){
+            periodCh.enable();
             timelineStart.enable();
             timelineEnd.enable();
             typeIn.enable();
@@ -428,13 +445,32 @@ $(function() {
         currentObj.addTimeZone(currentTimeZone);
     });
 
+    periodCh.change(function(){
+        var i = $(this).val();
+        if(i!=""){
+            i = parseInt(i);
+            var period = periods[i];
+
+            if(!currentTimeZone.spaceZone) currentObj.addTimeZone(currentTimeZone);
+
+            currentTimeZone.start = period.start;
+            timelineStart.val("timeline").children("[value=timeline]").text(timeFormat(period.start)+"("+period.id+")");
+            timelineStart.trigger("change");
+            currentTimeZone.end = period.end;
+            timelineEnd.val("timeline").children("[value=timeline]").text(timeFormat(period.end)+"("+period.id+")");
+            timelineEnd.trigger("change");
+        }else{
+            //...
+        }
+    });
+
     var triggerChange = function(){
         if($(this).val() == "timeline"){
             $(this).trigger("change");
         }
     };
     timelineStart.click(triggerChange);
-    timelineStart.click(triggerChange);
+    timelineEnd.click(triggerChange);
 
     timelineStart.change(function(){
         if(et){
@@ -468,6 +504,58 @@ $(function() {
         if($(this).val() == "today"){
             showGuide(timeFormat(today().valueOf()));
         }
+    });
+
+    periodSave.click(function(){
+        if($(this).hasClass("disabled")) return false;
+
+        var startType = timelineStart.val();
+        var endType = timelineEnd.val();
+        var name = nameIn.val();
+
+        switch(startType){
+            case "": 
+                alert("无法添加，未选择开始时间");
+                timelineStart.highlight();
+                return false;
+            case "timeline": 
+                break;
+            case "today": 
+                currentTimeZone.start = today().valueOf();
+                break;
+            case "infinity": 
+                currentTimeZone.start = -62167334400000;
+                break;
+        }
+        switch(endType){
+            case "": 
+                alert("无法添加，未选择结束时间");
+                timelineEnd.highlight();
+                return false;
+            case "timeline": 
+                break;
+            case "today": 
+                currentTimeZone.end = today().valueOf();
+                break;
+            case "infinity": 
+                currentTimeZone.end = 2000000000000;
+                break;
+        }
+
+        savePeriod({
+            start: currentTimeZone.start,
+            end: currentTimeZone.end,
+            description: "test",
+            name: name
+        }, function(){
+            showGuide("保存成功");
+            refreshPeriods();
+            init();
+        }, function(){
+            showGuide("保存失败，请再尝试");
+        });
+
+        showGuide('已添加，点击<i class="icon-save"></i>保存对象，也可以继续添加时段信息');
     });
 
     timelineSelectOk.click(function() {

@@ -44,10 +44,9 @@
           </li>
           <form id="time-vals-in" class="vals-in">
             <li class="seperator"></li>
-            <!-- <li id="timeline-select" class="op disabled" ntitle="在时间轴上选择一个时间段">
-              <i class="icon-edit"></i>
-            </li> -->
-            <!-- <input name="start" type="text" class="val-in click-choose align_center" placeholder="点击选择起始时间点" ntitle="留空表示负无穷" disabled="disabled" /> -->
+            <select name="period" id="period" class="val-in" disabled="disabled">
+              <option value="">点击选取已定义时段</option>
+            </select>
             <select name="start" id="" class="val-in" disabled="disabled">
               <option value="">选择起始时间点</option>
               <option value="timeline">从时间轴上点选</option>
@@ -55,13 +54,15 @@
               <!-- <option value="infinity">负无穷</option> -->
             </select>
             <li class="words"> - </li>
-            <!-- <input name="end" type="text" class="val-in click-choose align_center" placeholder="点击选择结束时间点" ntitle="留空表示正无穷" disabled="disabled" /> -->
             <select name="end" id="" class="val-in" disabled="disabled">
               <option value="">选择结束时间点</option>
               <option value="timeline">从时间轴上点选</option>
               <option value="today">今天</option>
               <!-- <option value="infinity">正无穷</option> -->
             </select>
+            <li id="period-save" class="op" ntitle="将该时间段保存">
+              <i class="icon-save"></i>
+            </li>
             <li id="timeline-select-ok" class="op disabled" ntitle="添加已选择时间信息">
               <i class="icon-ok"></i>
             </li>
