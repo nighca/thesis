@@ -21,10 +21,27 @@ var getPeriods = function(callback, fail){
     }, fail);
 };
 
+var getZones = function(callback, fail){
+    getData("php/get.php?limit=zone", function(ret){
+        if(ret){
+            for (var i = ret.length - 1; i >= 0; i--) {
+                ret[i].space = parseSpace(JSON.parse(ret[i].space));
+            };
+        }
+        callback(ret);
+    }, fail);
+};
+
 var savePeriod = function(data, callback, fail){
     data.action = "create_period";
     data.begin = timeFormat(data.start);
     data.end = timeFormat(data.end);
+    postData(data, "php/op.php", callback, fail);
+};
+
+var saveZone = function(data, callback, fail){
+    data.action = "create_zone";
+    data.space = spaceZoneToWKT(data.space);
     postData(data, "php/op.php", callback, fail);
 };
 

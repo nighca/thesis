@@ -337,6 +337,7 @@ function disableSpaceSelect(e){
 }
 
 function showSpaceZone(map, zone, afterShow){
+  console.log(map, zone);//---------------------------
   var overLays = {};
   switch(zone.type){
     case 1:

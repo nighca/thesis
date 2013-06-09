@@ -63,6 +63,7 @@
             <li id="period-save" class="op" ntitle="将该时间段保存">
               <i class="icon-save"></i>
             </li>
+            <li class="seperator"></li>
             <li id="timeline-select-ok" class="op disabled" ntitle="添加已选择时间信息">
               <i class="icon-ok"></i>
             </li>
@@ -92,6 +93,10 @@
           </li>
           <form id="space-vals-in" class="vals-in">
             <input id="name-in" name="name" type="text" class="val-in" placeholder="Id，对象(node)的ID" disabled="disabled" />
+            <li class="seperator"></li>
+            <select name="zone" id="zone" class="val-in" disabled="disabled">
+              <option value="">点击选取已定义区域</option>
+            </select>
             <select name="type" id="" class="val-in" disabled="disabled">
               <option value="0">空间区域类型选择</option>
               <option value="1">点</option>
@@ -103,10 +108,13 @@
               <i class="icon-edit"></i>
             </li>
             <input id="keyword-in" name="keyword" type="text" class="val-in" placeholder="搜索关键字" disabled="disabled" />
+            <li id="zone-save" class="op" ntitle="将该区域保存">
+              <i class="icon-save"></i>
+            </li>
+            <li class="seperator"></li>
             <li id="map-select-ok" class="op disabled" ntitle="将已选择区域添加到当前选择的时间段中">
               <i class="icon-ok"></i>
             </li>
-            <li class="seperator"></li>
             <li id="obj-create-ok" class="op disabled" ntitle="保存对象的时间空间属性">
               <i class="icon-save"></i>
             </li>

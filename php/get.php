@@ -6,6 +6,7 @@ switch($action){
     case 'within'                   : getWithin(); break;
     case 'near'                     : getNear(); break;
     case 'period'                   : list_period(); break;
+    case 'zone'                     : list_zone(); break;
     default 						: get(); break;
 }
 
@@ -92,6 +93,17 @@ function list_period(){
     $db = new DB();
 
     $sql = 'select * from period;';
+
+    @$getInfo = $db->getObjListBySql($sql);
+    $ret = count($getInfo)>0 ? json_encode($getInfo) : "null";
+
+    echo $ret;
+}
+
+function list_zone(){
+    $db = new DB();
+
+    $sql = 'select id, description, ST_AsGeoJSON(space) as space from zone;';
 
     @$getInfo = $db->getObjListBySql($sql);
     $ret = count($getInfo)>0 ? json_encode($getInfo) : "null";

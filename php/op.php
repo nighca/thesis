@@ -6,6 +6,7 @@ switch($action){
 	case 'insert'					: insert(); break;
 	case 'delete'					: delete(); break;
 	case 'create_period'			: create_period(); break;
+	case 'create_zone'				: create_zone(); break;
     default 						: echo 'null'; break;
 }
 
@@ -66,6 +67,18 @@ function create_period(){
 	$db = new DB();
 	$db->open();
     pg_query($db->conn, "insert into period values ('$name', '$begin', '$end', '$description');");
+
+    echo "null";
+}
+
+function create_zone(){
+	@$name = $_POST['name'];
+	@$description = $_POST['description'];
+	@$space = $_POST['space'];
+
+	$db = new DB();
+	$db->open();
+    pg_query($db->conn, "insert into zone(id, description, space) values ('$name', '$description', ST_GeomFromText('$space',4326));");
 
     echo "null";
 }

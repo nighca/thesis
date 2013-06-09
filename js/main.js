@@ -203,6 +203,8 @@ $(function() {
     var timelineEnd = timeForm.find("[name=end]");
     var periodCh = $("#period");
     var periodSave = $("#period-save");
+    var zoneCh = $("#zone");
+    var zoneSave = $("#zone-save");
     var mapSelectOk = $("#map-select-ok");
     var timelineSelectOk = $("#timeline-select-ok");
     var createOk = $("#obj-create-ok");
@@ -222,6 +224,7 @@ $(function() {
     var currentTimeZone = {};
 
     var periods = [];
+    var zones = [];
     
     var showGuide = function(word){
         guide.html(word);
@@ -233,6 +236,7 @@ $(function() {
             log(periods);//------------------
             periodCh.children(".add-on").remove();
             if(periods.length > 0){
+                zoneCh.children().eq(0).text('点击选取已定义时段');
                 for (var i = 0, l = periods.length; i < l; i++) {
                     var period = periods[i];
                     periodCh.append('<option class="add-on" value="'+i+'" title="'+period.description+'">'+period.id+'</option>');
@@ -243,6 +247,23 @@ $(function() {
         }, function(err){});
     };
     refreshPeriods();
+    window.refreshZones = function(){
+        getZones(function(ret){
+            zones = ret || [];
+            log(zones);//------------------
+            zoneCh.children(".add-on").remove();
+            if(zones.length > 0){
+                zoneCh.children().eq(0).text('点击选取已定义区域');
+                for (var i = 0, l = zones.length; i < l; i++) {
+                    var zone = zones[i];
+                    zoneCh.append('<option class="add-on" value="'+i+'" title="'+zone.description+'">'+zone.id+'</option>');
+                };
+            }else{
+                zoneCh.children().eq(0).text('无已定义区域');
+            }
+        }, function(err){});
+    };
+    refreshZones();
 
     var enableSpaceSelect = function(type, afterSelect){
         var e;
@@ -317,6 +338,7 @@ $(function() {
     var init = function(){
 	    initSelect();
         periodCh.disable();
+        zoneCh.disable();
         timelineStart.disable();
         timelineEnd.disable();
         typeIn.disable();
@@ -333,6 +355,7 @@ $(function() {
         mapSelectOk.disable();
         timelineSelect.disable();
         periodCh.val("");
+        zoneCh.val("");
         timelineStart.val("");
         timelineStart.children("[value=timeline]").text("从时间轴上点选");
         timelineEnd.val("");
@@ -423,6 +446,7 @@ $(function() {
         timelineSelect.setable(hasName);
         if(hasName){
             periodCh.enable();
+            zoneCh.enable();
             timelineStart.enable();
             timelineEnd.enable();
             typeIn.enable();
@@ -511,7 +535,8 @@ $(function() {
 
         var startType = timelineStart.val();
         var endType = timelineEnd.val();
-        var name = nameIn.val();
+        var name = prompt("请出入自定义时间段名称");
+        if(!name) return false;
 
         switch(startType){
             case "": 
@@ -545,7 +570,7 @@ $(function() {
         savePeriod({
             start: currentTimeZone.start,
             end: currentTimeZone.end,
-            description: "test",
+            description: "自定义时间段：" + name,
             name: name
         }, function(){
             showGuide("保存成功");
@@ -554,8 +579,6 @@ $(function() {
         }, function(){
             showGuide("保存失败，请再尝试");
         });
-
-        showGuide('已添加，点击<i class="icon-save"></i>保存对象，也可以继续添加时段信息');
     });
 
     timelineSelectOk.click(function() {
@@ -692,6 +715,47 @@ $(function() {
             showGuide('点击“空间”中的<i class="icon-ok"></i>将选取好的空间信息加入对象');
         });
         showGuide("在地图上选取空间范围");
+    });
+
+    zoneSave.click(function(){
+        if($(this).hasClass("disabled")) return false;
+
+        var name = prompt("请出入自定义区域名称");
+        if(!name) return false;
+        var type = parseInt(typeIn.val());
+        var spaceZone = parseOverLay(type, e.getOverLays());
+
+        saveZone({
+            description: "自定义区域：" + name,
+            name: name,
+            space: spaceZone
+        }, function(){
+            showGuide("保存成功");
+            refreshZones();
+            init();
+        }, function(){
+            showGuide("保存失败，请再尝试");
+        });
+    });
+
+    zoneCh.change(function(){
+        var i = $(this).val();
+        if(i!=""){
+            typeIn.disable();
+
+            i = parseInt(i);
+            var zone = zones[i];
+            //console.log(zones, zone);//------------------------
+            typeIn.val(zone.space.type);
+            e && e.clean();
+            e = showSpaceZone(map, zone.space, function(){
+                mapSelectOk.enable();
+            });
+            console.log(e.getOverLays());//----------------------------
+        }else{
+            typeIn.enable();
+            e && e.clean();
+        }
     });
 
     mapSelectOk.click(function() {
