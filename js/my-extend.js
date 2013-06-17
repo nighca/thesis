@@ -7,7 +7,9 @@ var isArray = function(obj){
 };
 
 var log = function(){
-	console.log.apply(console, arguments);
+	if(console.log.apply){
+		console.log.apply(console, arguments);
+	}
 };
 
 var postData = function (data, url, success, fail) {

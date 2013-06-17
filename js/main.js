@@ -176,7 +176,7 @@ $(function() {
                 break;
             }
         };
-        obj && obj.delete(function(){
+        obj && obj.remove(function(){
             refreshFromRemote();
         }, function(){
             refreshFromRemote();

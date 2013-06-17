@@ -1,3 +1,7 @@
+var JSON = JSON || {
+    parse: $.parseJSON
+};
+
 var objList = [];
 
 var dataset = {
@@ -199,7 +203,7 @@ TimeSpaceObj.prototype.load = function(name) {
     return this;
 };
 
-TimeSpaceObj.prototype.delete = function(callback, fail) {
+TimeSpaceObj.prototype.remove = function(callback, fail) {
     postData({
         "action":"delete",
         "objId":this.id

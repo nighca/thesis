@@ -86,7 +86,7 @@ TimeSpaceObj.prototype.load = function(name) {
     return this;
 };
 
-TimeSpaceObj.prototype.delete = function() {
+TimeSpaceObj.prototype.remove = function() {
     removeFromLocal(this.name, "TimeSpaceObj");
     this = null;
     return this;
