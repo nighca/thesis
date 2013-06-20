@@ -138,8 +138,9 @@ TimeMap.prototype.showObjs = function(objs){
     var dts = this.datasets;
     if(!dts[datasetId]) return false;
     var dt = dts[datasetId];
+    dt.clear();
 
-    var certainDate;
+    var minDate, maxDate;
     var items = [];
     $.each(objs, function(i, obj){
         $.each(obj.timeZone.zones, function(j, timeZone){
@@ -151,7 +152,8 @@ TimeMap.prototype.showObjs = function(objs){
                 thumbnail: obj.thumbnail,
                 description: obj.description
             };
-            certainDate = (timeZone.start + timeZone.start)/2;
+            minDate = minDate < timeZone.start ? minDate : timeZone.start;
+            maxDate = maxDate > timeZone.end ? maxDate : timeZone.end;
             var pos = timeZone.spaceZone.getPos();
 
             if(pos){
@@ -159,15 +161,28 @@ TimeMap.prototype.showObjs = function(objs){
                     lat: pos.lat,
                     lon: pos.lng
                 };
-                items.push(item);
+                //items.push(item);
+
+                var ii = dt.loadItem(item, function(it){
+                    if(TimeMap.themes[it.type]){
+                        if(!it.options){
+                            it.options = {};
+                        }
+                        it.options.theme = it.type;
+                        it.options.thumbnail = it.thumbnail || "/hzm/sites/default/files/logo2.png";
+                        it.options.description = it.description || "无简介";
+                        it.options.infoTemplate = '<div class="info-window"><img class="left thumbnail" src="{{thumbnail}}"><h4>{{title}}</h4><p>{{description}}</p></div>';
+                    }
+                    return it;
+                });
+                if(!obj.item) obj.item = ii;
             }
         });
     });
 
-    dt.clear();
-    dt.loadItems(items, function(item){
+    /*dt.loadItems(items, function(item){
         if(TimeMap.themes[item.type]){
-            log(item);//-----------------------
+            window.iii = item;//---------------------------------
             if(!item.options){
                 item.options = {};
             }
@@ -177,8 +192,11 @@ TimeMap.prototype.showObjs = function(objs){
             item.options.infoTemplate = '<div class="info-window"><img class="left thumbnail" src="{{thumbnail}}"><h4>{{title}}</h4><p>{{description}}</p></div>';
         }
         return item;
-    });
+    });*/
 
-    certainDate && timeline.getBand(0).setCenterVisibleDate(new Date(certainDate));
+    minDate && timeline.getBand(0).setCenterVisibleDate(new Date((minDate.valueOf()+maxDate.valueOf())/2));
+    //minDate && timeline.getBand(0).setMinVisibleDate(minDate);
+    //maxDate && timeline.getBand(0).setMaxVisibleDate(maxDate);
     timeline.layout();
+    tm.map.autoCenterAndZoom();
 };

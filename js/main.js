@@ -8,6 +8,8 @@ var rightList;
 
 var useResult;
 
+var enableRM = false;
+
 /**
  * main -------------------------------------------------------
  */
@@ -23,18 +25,24 @@ $(function() {
         name: "simple"
     });
 
-    var theme = Timeline.ClassicTheme.create();
-    theme.mouseWheel = 'scroll';
+    var theme1 = Timeline.ClassicTheme.create();
+    var theme2 = Timeline.ClassicTheme.create();
+    theme2.mouseWheel = 'scroll';
+    //theme.event.track.height = 0;
+    theme1.event.track.gap = -13;
+    theme1.event.track.offset = 0;
+    theme1.event.tape.height = 4;
+
     var eventSource = new Timeline.DefaultEventSource();
     var bands = [
     Timeline.createBandInfo({
         //date: "Jun 28 2006 00:00:00 GMT",
         width: "70%",
-        intervalUnit: Timeline.DateTime.YEAR,
-        intervalPixels: 100,
+        intervalUnit: Timeline.DateTime.DECADE,
+        intervalPixels: 400,
         eventSource: eventSource,
-        theme: theme,
-        zoomIndex: 6,
+        theme: theme1,
+        zoomIndex: 9,
         zoomSteps: new Array(
         {
             pixelsPerInterval: 200,
@@ -86,9 +94,9 @@ $(function() {
         intervalUnit: Timeline.DateTime.CENTURY,
         intervalPixels: 200,
         showEventText: false,
-        trackHeight: 0.5,
-        trackGap: 0.2,
-        theme: theme,
+        //trackHeight: 0.5,
+        //trackGap: 0.2,
+        theme: theme2,
         eventSource: eventSource,
         overview: true
     })];
@@ -118,6 +126,12 @@ $(function() {
  */
 
  $(function(){
+    $("#timeline-band-0").delegate(".timeline-event-tape", "mouseenter", function(e){
+        $(this).next().css("width", "auto").css("z-index", "1").show();
+    }).delegate(".timeline-event-tape", "mouseleave", function(e){
+        $(this).next().hide();
+    });
+
     var refreshList = function(list){
         if(list) objList = list;
         tm.showObjs(objList);
@@ -149,11 +163,13 @@ $(function() {
                 break;
             }
         };
+        chosenObj.item.openInfoWindow();
+        //console.log(tm.getItems());
 
-        timeliner && timeliner.clean && timeliner.clean();
-        maper && maper.clean && maper.clean();
+        //timeliner && timeliner.clean && timeliner.clean();
+        //maper && maper.clean && maper.clean();
         //timeliner = showTimeZones(tm.timeline, chosenObj.timeZone.zones, function(){});
-        maper = showSpaceZones(map, chosenObj.timeZone.zones[0].spaceZone.zones, function(){});
+        //maper = showSpaceZones(map, chosenObj.timeZone.zones[0].spaceZone.zones, function(){});
     });
     $("#objs").delegate(".ttl", "click", function(){
         $(this).next(".cnt").slideToggle(200);
@@ -385,10 +401,14 @@ $(function() {
         es = disableSearchSelect(es);
     };
     
-    window.init = function(id, name){
+    window.init = function(id, name, enRM){
     	createObj.trigger("click");
     	nameIn.val(id).trigger("keyup");
     	keywordIn.val(name);
+
+        if(enRM){
+
+        }
     };
 
     $("[ntitle]").hover(function(event){

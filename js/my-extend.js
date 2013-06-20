@@ -225,8 +225,9 @@ jQuery.fn.extend({
 
 		list.delegate(checkHandler, "click", function(){
 	        var obj = $(this).parent();
+	        var index = list.children().index(obj);
 	        list.set(obj);
-	        afterCheck && afterCheck(obj);
+	        afterCheck && afterCheck(obj, index);
 	    });
 
 	    return list;

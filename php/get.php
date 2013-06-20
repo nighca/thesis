@@ -13,7 +13,7 @@ switch($action){
 function get(){
 	$db = new DB();
 
-    $sql = "select obj.*, image.thumbnail, field_data_body.body_value as description from (";
+    $sql = "select obj.*, image.thumbnail, field_data_body.body_summary as description from (";
 	$sql .= "select extract(epoch FROM timea.begin) as begin, extract(epoch FROM timea.end) as end, ST_AsGeoJSON(space.item) as space, node.title as name, node.type, node.nid as id from";
 	$sql .= " timea join node on timea.idarti=node.nid";
 	$sql .= " left join geo on timea.idgeo=geo.idgeo";
@@ -39,7 +39,7 @@ function getWithin(){
 
     $db = new DB();
 
-    $sql = "select obj.*, image.thumbnail, field_data_body.body_value as description from (";
+    $sql = "select obj.*, image.thumbnail, field_data_body.body_summary as description from (";
     $sql .= "select extract(epoch FROM timea.begin) as begin, extract(epoch FROM timea.end) as end, ST_AsGeoJSON(space.item) as space, node.title as name, node.type, node.nid as id from";
     $sql .= " timea join node on timea.idarti=node.nid";
     $sql .= " left join geo on timea.idgeo=geo.idgeo";
@@ -67,7 +67,7 @@ function getNear(){
 
     $db = new DB();
 
-    $sql = "select obj.*, image.thumbnail, field_data_body.body_value as description from (";
+    $sql = "select obj.*, image.thumbnail, field_data_body.body_summary as description from (";
     $sql .= "select extract(epoch FROM timea.begin) as begin, extract(epoch FROM timea.end) as end, ST_AsGeoJSON(space.item) as space, node.title as name, node.type, node.nid as id from";
     $sql .= " timea join node on timea.idarti=node.nid";
     $sql .= " left join geo on timea.idgeo=geo.idgeo";
