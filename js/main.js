@@ -29,7 +29,7 @@ $(function() {
     var theme2 = Timeline.ClassicTheme.create();
     theme2.mouseWheel = 'scroll';
     //theme.event.track.height = 0;
-    theme1.event.track.gap = -13;
+    theme1.event.track.gap = -6;//-13
     theme1.event.track.offset = 0;
     theme1.event.tape.height = 4;
 
