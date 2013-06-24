@@ -88,8 +88,8 @@ TimeSpaceObj.prototype.load = function(name) {
 
 TimeSpaceObj.prototype.remove = function() {
     removeFromLocal(this.name, "TimeSpaceObj");
-    this = null;
-    return this;
+    //this = null;
+    return null;
 };
 
 var parseOverLay = function(type, overLays){
@@ -150,7 +150,8 @@ TimeMap.prototype.showObjs = function(objs){
                 title: obj.name,
                 type: obj.type,
                 thumbnail: obj.thumbnail,
-                description: obj.description
+                description: obj.description,
+                url: obj.url || '/hzm/xxx/' + obj.id
             };
             minDate = minDate < timeZone.start ? minDate : timeZone.start;
             maxDate = maxDate > timeZone.end ? maxDate : timeZone.end;
@@ -164,15 +165,22 @@ TimeMap.prototype.showObjs = function(objs){
                 //items.push(item);
 
                 var ii = dt.loadItem(item, function(it){
-                    if(TimeMap.themes[it.type]){
-                        if(!it.options){
-                            it.options = {};
-                        }
-                        it.options.theme = it.type;
-                        it.options.thumbnail = it.thumbnail || "/hzm/sites/default/files/logo2.png";
-                        it.options.description = it.description || "无简介";
-                        it.options.infoTemplate = '<div class="info-window"><img class="left thumbnail" src="{{thumbnail}}"><h4>{{title}}</h4><p>{{description}}</p></div>';
+                    if(!it.options){
+                        it.options = {};
                     }
+                    it.options.theme = it.type;
+                    it.options.thumbnail = it.thumbnail || "/hzm/sites/default/files/logo2.png";
+                    it.options.description = it.description || "无简介";
+                    it.options.infoTemplate = 
+                        '<div class="info-window">' + 
+                        '<a target="_blank" href="' + it.url + '">' + 
+                        '<img class="left thumbnail" src="{{thumbnail}}">' + 
+                        '</a>' + 
+                        '<a target="_blank" href="' + it.url + '">' + 
+                        '<h4>{{title}}</h4>' + 
+                        '</a>' + 
+                        '<p>{{description}}</p>' + 
+                        '</div>';
                     return it;
                 });
                 if(!obj.item) obj.item = ii;
